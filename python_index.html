@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>파이썬 학습 노트</title>
+<style>
+/* 파이썬 실습실 – 스타일
+   레이아웃: 상단 바 + 좌측 단원 목록 + 중앙 학습 영역 (좁은 화면에서는 목록이 서랍으로 전환)
+   모든 색은 토큰으로 정의하고 라이트/다크를 같은 구조로 둔다. */
+:root {
+  --bg: #F3F5F9; --surface: #FFFFFF; --surface2: #EAEEF5; --line: #D5DCE7; --line2: #E4E9F1;
+  --fg: #16202F; --muted: #586479;
+  --accent: #245BB5; --accent-fg: #FFFFFF; --accent-soft: #E2ECFB; --accent-line: #B7CDF0;
+  --book: #0F6E63; --book-soft: #DDF1EE;
+  --ai: #8F5600; --ai-soft: #FFEFD0;
+  --ok: #1B7A4B; --ok-soft: #DDF3E7; --err: #B3261E; --err-soft: #FCE4E1; --warn: #8A6100;
+  --code-bg: #F6F8FC; --out-bg: #0E1622; --out-fg: #E3EAF4; --out-err: #FF9C8F; --out-echo: #8FD6A8; --out-dim: #7D8CA3;
+  --syn-kw: #A53F8C; --syn-str: #1C7C4D; --syn-num: #B45309; --syn-com: #7A8699; --syn-def: #245BB5; --syn-builtin: #0E7490; --syn-op: #586479;
+  --diff-del: #FDE4E1; --diff-add: #DDF3E7; --diff-chg: #FFF1CF;
+  --shadow: 0 1px 2px rgba(20,32,50,.06), 0 4px 14px rgba(20,32,50,.05);
+  --topbar-h: 56px; --side-w: 304px; --radius: 10px;
+  --font: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, "D2Coding", monospace;
+  --code-size: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D131C; --surface: #141C28; --surface2: #1B2433; --line: #2A3547; --line2: #212B3B;
+    --fg: #E5EBF4; --muted: #9AA6BA;
+    --accent: #7EA6EE; --accent-fg: #0D131C; --accent-soft: #1B2A45; --accent-line: #33507F;
+    --book: #5CC4B5; --book-soft: #12302D; --ai: #F0B45A; --ai-soft: #3A2B10;
+    --ok: #58C98D; --ok-soft: #12301F; --err: #FF8E82; --err-soft: #3A1713; --warn: #E3B341;
+    --code-bg: #101824; --out-bg: #080D14; --out-fg: #DCE5F2; --out-err: #FF9C8F; --out-echo: #7FD4A0; --out-dim: #7B8AA1;
+    --syn-kw: #D98BC5; --syn-str: #7FD4A0; --syn-num: #F0B57A; --syn-com: #7F8DA3; --syn-def: #8DB4F5; --syn-builtin: #6CCBE0; --syn-op: #9AA6BA;
+    --diff-del: #3A1D1B; --diff-add: #14301F; --diff-chg: #3A3016;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D131C; --surface: #141C28; --surface2: #1B2433; --line: #2A3547; --line2: #212B3B;
+  --fg: #E5EBF4; --muted: #9AA6BA;
+  --accent: #7EA6EE; --accent-fg: #0D131C; --accent-soft: #1B2A45; --accent-line: #33507F;
+  --book: #5CC4B5; --book-soft: #12302D; --ai: #F0B45A; --ai-soft: #3A2B10;
+  --ok: #58C98D; --ok-soft: #12301F; --err: #FF8E82; --err-soft: #3A1713; --warn: #E3B341;
+  --code-bg: #101824; --out-bg: #080D14; --out-fg: #DCE5F2; --out-err: #FF9C8F; --out-echo: #7FD4A0; --out-dim: #7B8AA1;
+  --syn-kw: #D98BC5; --syn-str: #7FD4A0; --syn-num: #F0B57A; --syn-com: #7F8DA3; --syn-def: #8DB4F5; --syn-builtin: #6CCBE0; --syn-op: #9AA6BA;
+  --diff-del: #3A1D1B; --diff-add: #14301F; --diff-chg: #3A3016;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { height: 100%; -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--topbar-h) + 14px); }
+body {
+  margin: 0; min-height: 100%; background: var(--bg); color: var(--fg);
+  font: 400 15px/1.65 var(--font); letter-spacing: -0.005em; word-break: keep-all; overflow-wrap: anywhere;
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: .92em; background: var(--surface2); padding: .08em .38em; border-radius: 5px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* ── 상단 바 ─────────────────────────── */
+.topbar {
+  position: sticky; top: 0; z-index: 30; height: var(--topbar-h);
+  display: flex; align-items: center; gap: 14px;
+  padding-inline: max(14px, env(safe-area-inset-left, 0px)) max(14px, env(safe-area-inset-right, 0px));
+  background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.iconbtn {
+  width: 38px; height: 38px; display: inline-grid; place-items: center; flex: none;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 9px;
+}
+.iconbtn:hover { background: var(--surface2); }
+.iconbtn svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.menu-btn { display: none; }
+.brand { font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; display: flex; align-items: baseline; gap: 8px; }
+.brand .mark { font-family: var(--mono); color: var(--accent); font-weight: 700; }
+.crumb { color: var(--muted); font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.crumb b { color: var(--fg); font-weight: 600; }
+.top-spacer { flex: 1; }
+.progress-wrap { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.progress-label { font-size: 13px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.progress-label b { color: var(--fg); }
+.bar { width: 150px; height: 8px; background: var(--surface2); border-radius: 99px; overflow: hidden; border: 1px solid var(--line2); }
+.bar > i { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .35s ease; }
+.runner-dot { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+.runner-dot::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.runner-dot[data-state="ready"]::before { background: var(--ok); }
+.runner-dot[data-state="loading"]::before { background: var(--warn); animation: pulse 1.1s ease-in-out infinite; }
+.runner-dot[data-state="error"]::before { background: var(--err); }
+@keyframes pulse { 50% { opacity: .35; } }
+.save-ind { font-size: 12.5px; color: var(--muted); white-space: nowrap; min-width: 4.2em; text-align: right; }
+
+/* ── 전체 레이아웃 ─────────────────────── */
+.layout { display: grid; grid-template-columns: var(--side-w) minmax(0, 1fr); align-items: start; }
+.side {
+  position: sticky; top: var(--topbar-h); height: calc(100vh - var(--topbar-h)); height: calc(100dvh - var(--topbar-h));
+  overflow-y: auto; background: var(--surface); border-right: 1px solid var(--line);
+  padding: 14px 10px max(16px, env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left, 0px));
+  display: flex; flex-direction: column; gap: 6px;
+}
+.side-title { font-size: 12px; letter-spacing: .08em; color: var(--muted); padding: 4px 10px 6px; text-transform: uppercase; }
+.chitem {
+  display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; grid-template-areas: "no tt cnt" "no bar bar";
+  column-gap: 8px; row-gap: 5px; align-items: center; padding: 9px 10px; border-radius: 9px;
+  color: var(--fg); text-decoration: none; border: 1px solid transparent;
+}
+.chitem:hover { background: var(--surface2); }
+.chitem[aria-current="page"] { background: var(--accent-soft); border-color: var(--accent-line); }
+.chitem .no { grid-area: no; font-family: var(--mono); font-weight: 700; font-size: 17px; color: var(--accent); text-align: center; }
+.chitem .tt { grid-area: tt; font-size: 14px; font-weight: 500; line-height: 1.3; min-width: 0; }
+.chitem .cnt { grid-area: cnt; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chitem .mini { grid-area: bar; height: 4px; border-radius: 4px; background: var(--surface2); overflow: hidden; }
+.chitem .mini > i { display: block; height: 100%; background: var(--ok); }
+.chitem.complete .no { color: var(--ok); }
+.side-foot { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line2); display: grid; gap: 8px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 36px; padding: 6px 12px; border: 1px solid var(--line); background: var(--surface);
+  border-radius: 8px; font-size: 14px; font-weight: 500; white-space: nowrap;
+}
+.btn:hover { background: var(--surface2); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); font-weight: 600; }
+.btn.primary:hover { filter: brightness(1.07); background: var(--accent); }
+.btn.danger { color: var(--err); border-color: var(--err); }
+.btn.sm { min-height: 30px; padding: 3px 10px; font-size: 13px; }
+.btn.ghost { border-color: transparent; background: transparent; }
+.btn.ghost:hover { background: var(--surface2); }
+.btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
+.scrim { display: none; }
+
+.main { min-width: 0; padding: 26px max(20px, env(safe-area-inset-right, 0px)) max(60px, env(safe-area-inset-bottom, 0px)) 28px; }
+.main-inner { max-width: 920px; margin: 0 auto; }
+
+/* ── 단원 머리말 · 탭 ──────────────────── */
+.chhead { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 18px; align-items: end; margin-bottom: 18px; }
+.chhead .big { font-family: var(--mono); font-weight: 700; font-size: 64px; line-height: .9; color: var(--accent); letter-spacing: -.04em; }
+.chhead h1 { margin: 0; font-size: 28px; line-height: 1.25; letter-spacing: -.02em; text-wrap: balance; }
+.chhead .meta { margin-top: 6px; color: var(--muted); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; background: var(--surface2); padding: 5px; border-radius: 12px; margin-bottom: 20px; position: sticky; top: calc(var(--topbar-h) + 8px); z-index: 10; border: 1px solid var(--line2); }
+.tab {
+  border: 0; background: transparent; padding: 8px 6px; border-radius: 8px; display: grid; gap: 1px; justify-items: center; line-height: 1.25;
+}
+.tab .t1 { font-weight: 600; font-size: 14.5px; }
+.tab .t2 { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tab[aria-selected="true"] { background: var(--surface); box-shadow: var(--shadow); color: var(--accent); }
+.tab[aria-selected="true"] .t2 { color: var(--accent); }
+.tab:hover:not([aria-selected="true"]) { background: color-mix(in srgb, var(--surface) 55%, transparent); }
+
+/* ── 설명 ─────────────────────────────── */
+.secnav { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; padding: 3px 10px; border-radius: 99px;
+  background: var(--surface); border: 1px solid var(--line); color: var(--fg); text-decoration: none; line-height: 1.5;
+}
+a.chip:hover, button.chip:hover { background: var(--accent-soft); border-color: var(--accent-line); }
+.concept-sec { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 22px 16px; margin-bottom: 14px; }
+.concept-sec > h2 { margin: 0 0 10px; font-size: 19px; letter-spacing: -.01em; display: flex; align-items: center; gap: 10px; }
+.concept-sec > h2::before { content: ""; width: 4px; height: 1em; background: var(--accent); border-radius: 3px; }
+.md p { margin: .45em 0; }
+.md ul, .md ol { margin: .4em 0; padding-left: 1.4em; }
+.md li { margin: .15em 0; }
+.md li > ul, .md li > ol { margin: .1em 0; }
+.md blockquote { margin: .6em 0; padding: .3em 1em; border-left: 3px solid var(--accent-line); color: var(--muted); }
+.codeblock { position: relative; margin: 10px 0; border: 1px solid var(--line); border-radius: 8px; background: var(--code-bg); }
+.codeblock pre { margin: 0; padding: 12px 14px; overflow-x: auto; font: 400 var(--code-size)/1.6 var(--mono); tab-size: 4; }
+.codeblock .cb-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 5px 8px; border-bottom: 1px solid var(--line2); font-size: 12.5px; color: var(--muted); }
+.codeblock .cb-bar .sp { flex: 1; }
+.codeblock .tag-tmpl { color: var(--warn); font-weight: 500; }
+.cm-keyword, .tok-kw { color: var(--syn-kw); font-weight: 500; }
+.cm-string, .cm-string-2 { color: var(--syn-str); }
+.cm-number { color: var(--syn-num); }
+.cm-comment { color: var(--syn-com); font-style: italic; }
+.cm-def { color: var(--syn-def); }
+.cm-builtin { color: var(--syn-builtin); }
+.cm-operator { color: var(--syn-op); }
+.cm-variable-2 { color: var(--fg); }
+.cm-meta { color: var(--syn-builtin); }
+
+/* ── 문제 카드 ────────────────────────── */
+.pcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 18px; box-shadow: var(--shadow); overflow: hidden; scroll-margin-top: calc(var(--topbar-h) + 80px); }
+.pcard.is-done { border-color: color-mix(in srgb, var(--ok) 45%, var(--line)); }
+.pc-head { display: flex; align-items: center; gap: 12px; padding: 12px 16px 6px; flex-wrap: wrap; }
+.done-btn {
+  width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); display: grid; place-items: center; flex: none; padding: 0;
+}
+.done-btn svg { width: 15px; height: 15px; stroke: var(--accent-fg); fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+.done-btn[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); }
+.done-btn[aria-pressed="true"] svg { opacity: 1; }
+.done-btn:hover { border-color: var(--ok); }
+.pc-head h3 { margin: 0; font-size: 17px; letter-spacing: -.01em; flex: 1 1 auto; min-width: 8em; }
+.pc-head h3 .idx { font-family: var(--mono); color: var(--muted); font-weight: 500; margin-right: 6px; font-size: 14px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-size: 12px; padding: 1px 9px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); background: var(--surface2); line-height: 1.6; white-space: nowrap; }
+.tag.book { color: var(--book); background: var(--book-soft); border-color: transparent; font-weight: 600; }
+.tag.ai { color: var(--ai); background: var(--ai-soft); border-color: transparent; font-weight: 600; }
+.tag.none { color: var(--err); background: var(--err-soft); border-color: transparent; font-weight: 600; }
+.tag.extra { color: var(--ai); background: var(--ai-soft); border-color: transparent; }
+.pc-body { padding: 4px 16px 14px; }
+.prompt { margin: 2px 0 8px; }
+.notebox { margin: 8px 0; padding: 8px 12px; border-radius: 8px; background: var(--ai-soft); color: var(--fg); font-size: 13.5px; border-left: 3px solid var(--ai); }
+.notebox b { color: var(--ai); }
+.notebox.err { background: var(--err-soft); border-left-color: var(--err); }
+.lesson { margin: 8px 0; }
+.lesson > summary { cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--book); padding: 4px 0; }
+.edwrap { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--code-bg); margin-top: 8px; }
+.edwrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.edlabel { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); padding: 4px 10px; border-bottom: 1px solid var(--line2); background: var(--surface2); }
+.CodeMirror { height: auto; min-height: 132px; font: 400 var(--code-size)/1.6 var(--mono); background: var(--code-bg); color: var(--fg); }
+.CodeMirror-gutters { background: var(--surface2); border-right: 1px solid var(--line2); }
+.CodeMirror-linenumber { color: var(--muted); }
+.CodeMirror-cursor { border-left: 2px solid var(--fg); }
+.CodeMirror-selected { background: var(--accent-soft) !important; }
+.CodeMirror-focused .CodeMirror-selected { background: var(--accent-line) !important; }
+.CodeMirror-matchingbracket { color: var(--ok) !important; background: var(--ok-soft); }
+.CodeMirror-nonmatchingbracket { color: var(--err) !important; }
+.CodeMirror-lines { padding: 8px 0; }
+.plain-ed { display: grid; grid-template-columns: auto minmax(0, 1fr); background: var(--code-bg); }
+.plain-ed .gut { margin: 0; padding: 12px 8px 12px 10px; text-align: right; color: var(--muted); background: var(--surface2); border-right: 1px solid var(--line2); font: 400 var(--code-size)/1.6 var(--mono); user-select: none; }
+.plain-ed textarea { border: 0; outline: 0; resize: none; background: transparent; padding: 12px 12px; font: 400 var(--code-size)/1.6 var(--mono); white-space: pre; overflow-x: auto; overflow-y: hidden; min-height: 132px; width: 100%; tab-size: 4; }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; }
+.toolbar .sp { flex: 1; }
+.stdin-box { margin-top: 8px; }
+.stdin-box label { font-size: 12.5px; color: var(--muted); display: block; margin-bottom: 4px; }
+.stdin-box textarea { width: 100%; min-height: 72px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--code-bg); font: 400 var(--code-size)/1.5 var(--mono); resize: vertical; }
+
+.out { margin-top: 12px; border-radius: 8px; overflow: hidden; background: var(--out-bg); color: var(--out-fg); border: 1px solid color-mix(in srgb, var(--out-bg) 70%, var(--line)); }
+.out-head { display: flex; align-items: center; gap: 10px; padding: 6px 12px; font-size: 12.5px; background: color-mix(in srgb, var(--out-bg) 80%, #fff 6%); color: var(--out-dim); }
+.out-head .out-status { flex: 1; min-width: 0; color: var(--out-fg); }
+.out-head .out-status[data-k="ok"] { color: var(--out-echo); }
+.out-head .out-status[data-k="error"], .out-head .out-status[data-k="timeout"], .out-head .out-status[data-k="fatal"] { color: var(--out-err); }
+.out-head button { background: transparent; border: 0; color: var(--out-dim); font-size: 12.5px; padding: 2px 6px; border-radius: 5px; }
+.out-head button:hover { color: var(--out-fg); background: rgba(255,255,255,.08); }
+.out-body { margin: 0; padding: 10px 14px; font: 400 var(--code-size)/1.55 var(--mono); white-space: pre-wrap; word-break: break-all; min-height: 2.6em; max-height: 420px; overflow: auto; }
+.out-body .ph { color: var(--out-dim); font-style: italic; font-family: var(--font); }
+.out-body .err { color: var(--out-err); }
+.out-body .echo { color: var(--out-echo); }
+.out-figs { display: grid; gap: 10px; padding: 0 14px 12px; }
+.out-figs img { max-width: 100%; height: auto; background: #fff; border-radius: 6px; justify-self: start; }
+.out-files { border-top: 1px solid rgba(255,255,255,.1); padding: 8px 14px 10px; font-size: 13px; }
+.out-files summary { cursor: pointer; color: var(--out-dim); }
+.out-files pre { margin: 6px 0 2px; padding: 8px 10px; background: rgba(255,255,255,.06); border-radius: 6px; font: 400 13px/1.5 var(--mono); white-space: pre-wrap; }
+.out-input { display: flex; gap: 8px; align-items: center; padding: 8px 14px 12px; border-top: 1px dashed rgba(255,255,255,.18); }
+.out-input .pt { font: 400 var(--code-size)/1.5 var(--mono); color: var(--out-echo); white-space: pre-wrap; max-width: 48%; }
+.out-input input { flex: 1; min-width: 0; padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.07); color: var(--out-fg); font: 400 var(--code-size)/1.5 var(--mono); }
+.out-input button { padding: 6px 12px; border-radius: 6px; border: 0; background: var(--accent); color: var(--accent-fg); font-weight: 600; }
+
+.hints { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.hints li { padding: 8px 12px; border-radius: 8px; background: var(--ai-soft); border-left: 3px solid var(--ai); font-size: 14px; }
+.hints li b { color: var(--ai); margin-right: 6px; font-size: 12.5px; letter-spacing: .02em; }
+.tests { margin-top: 10px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; font-size: 13.5px; }
+.tests .trow { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 4px 10px; padding: 8px 12px; border-top: 1px solid var(--line2); }
+.tests .trow:first-child { border-top: 0; }
+.tests .trow.ok { background: var(--ok-soft); }
+.tests .trow.bad { background: var(--err-soft); }
+.tests .trow pre { margin: 2px 0 0; white-space: pre-wrap; font: 400 13px/1.45 var(--mono); }
+.tests .trow .k { color: var(--muted); font-size: 12px; }
+.tests .thead { padding: 6px 12px; background: var(--surface2); font-weight: 600; font-size: 13px; }
+
+.answer { margin-top: 12px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.answer.book { border-color: color-mix(in srgb, var(--book) 55%, var(--line)); }
+.answer.ai { border-color: color-mix(in srgb, var(--ai) 55%, var(--line)); }
+.answer-head { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 12px; background: var(--surface2); }
+.answer-head .sp { flex: 1; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface); padding: 4px 12px; font-size: 13px; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); font-weight: 600; }
+.answer-note { padding: 8px 12px; font-size: 13.5px; background: var(--ai-soft); border-bottom: 1px solid var(--line2); }
+.answer-body { padding: 0; }
+.answer-body .codeblock { margin: 0; border: 0; border-radius: 0; }
+.reftabs { display: flex; gap: 6px; padding: 8px 12px 0; flex-wrap: wrap; }
+
+.diffwrap { overflow-x: auto; }
+.diff { min-width: 620px; font: 400 13px/1.55 var(--mono); }
+.diff .dh { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface2); font: 600 12.5px var(--font); }
+.diff .dh div { padding: 5px 10px; }
+.diff .dh div + div { border-left: 1px solid var(--line); }
+.diff .dr { display: grid; grid-template-columns: 1fr 1fr; }
+.diff .dc { display: grid; grid-template-columns: 2.6em minmax(0, 1fr); min-width: 0; }
+.diff .dc + .dc { border-left: 1px solid var(--line); }
+.diff .dn { text-align: right; padding: 0 6px; color: var(--muted); background: var(--surface2); user-select: none; }
+.diff .dt { padding: 0 10px; white-space: pre-wrap; word-break: break-all; min-height: 1.55em; }
+.diff .del .dc:first-child .dt, .diff .del .dc:first-child .dn { background: var(--diff-del); }
+.diff .add .dc:last-child .dt, .diff .add .dc:last-child .dn { background: var(--diff-add); }
+.diff .chg .dt { background: var(--diff-chg); }
+.diff .dr.eq .dt { background: transparent; }
+.diffsum { padding: 7px 12px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line2); }
+.diffsum b { color: var(--fg); }
+
+.empty { text-align: center; padding: 40px 20px; border: 1px dashed var(--line); border-radius: var(--radius); color: var(--muted); background: var(--surface); }
+.empty b { color: var(--fg); display: block; font-size: 16px; margin-bottom: 6px; }
+.chnav { display: flex; justify-content: space-between; gap: 10px; margin-top: 28px; flex-wrap: wrap; }
+
+/* ── 대화상자 · 알림 ──────────────────── */
+dialog { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--fg); padding: 0; width: min(520px, calc(100vw - 28px)); box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+dialog::backdrop { background: rgba(8, 12, 20, .55); }
+.dlg-h { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--line2); }
+.dlg-h h2 { margin: 0; font-size: 17px; }
+.dlg-b { padding: 14px 18px 18px; display: grid; gap: 14px; max-height: 70vh; overflow: auto; }
+.field { display: grid; gap: 5px; }
+.field > label, .field > .lbl { font-size: 13px; font-weight: 600; }
+.field select, .field input[type="text"] { padding: 7px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); }
+.field .hint { font-size: 12.5px; color: var(--muted); }
+.radio-row { display: grid; gap: 6px; font-size: 14px; }
+.radio-row label { display: flex; gap: 8px; align-items: flex-start; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(20px); background: var(--fg); color: var(--bg); padding: 9px 16px; border-radius: 99px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 80; max-width: calc(100vw - 32px); text-align: center; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── 반응형 ───────────────────────────── */
+@media (max-width: 980px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .menu-btn { display: inline-grid; }
+  .side {
+    position: fixed; z-index: 50; left: 0; top: 0; bottom: 0; height: auto; width: min(86vw, 330px);
+    transform: translateX(-102%); transition: transform .22s ease; padding-top: max(14px, env(safe-area-inset-top, 0px));
+    box-shadow: 8px 0 30px rgba(0,0,0,.25);
+  }
+  body.nav-open .side { transform: none; }
+  body.nav-open .scrim { display: block; position: fixed; inset: 0; z-index: 40; background: rgba(8, 12, 20, .5); }
+  .main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-top: 18px; }
+  .brand .ko { display: none; }
+}
+@media (max-width: 640px) {
+  .crumb { display: none; }
+  .progress-label .of { display: none; }
+  .bar { width: 72px; }
+  .runner-dot span { display: none; }
+  .chhead .big { font-size: 46px; }
+  .chhead h1 { font-size: 22px; }
+  .concept-sec { padding: 14px 14px 12px; }
+  .tab .t1 { font-size: 13.5px; }
+  .pc-head, .pc-body { padding-left: 12px; padding-right: 12px; }
+  .toolbar .btn { flex: 1 1 auto; }
+  .toolbar .sp { display: none; }
+  .out-input { flex-wrap: wrap; }
+  .out-input .pt { max-width: 100%; flex: 1 0 100%; }
+  .save-ind { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } html { scroll-behavior: auto; } }
+
+.runner-dot,.menu-btn{}
+.edwrap textarea.code{display:block;width:100%;border:0;outline:0;resize:vertical;background:var(--code-bg);color:var(--fg);padding:12px 14px;font:400 var(--code-size)/1.6 var(--mono);min-height:11.5em;white-space:pre;overflow:auto;tab-size:4;border-radius:0}
+.edwrap{margin-top:10px}
+.warnbar{background:var(--err-soft);color:var(--fg);border-bottom:1px solid var(--err);padding:8px 16px;font-size:14px}
+.lesson-code{margin-top:6px}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <button class="iconbtn menu-btn" id="menu" type="button" aria-label="목차 열기/닫기" aria-expanded="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <div class="brand"><span class="mark">&gt;&gt;&gt;</span><span class="ko">파이썬 학습 노트</span></div>
+  <div class="crumb" id="crumb"></div>
+  <div class="top-spacer"></div>
+  <div class="progress-wrap"><span class="progress-label" id="plabel"></span>
+    <div class="bar" role="progressbar" aria-label="전체 진행률"><i id="pbar" style="width:0"></i></div></div>
+  <span class="save-ind" id="saveind" aria-live="polite"></span>
+</header>
+<div id="warn" class="warnbar" hidden>이 브라우저에서는 자동 저장을 쓸 수 없습니다(비공개 모드이거나 저장이 차단됨). 작성한 코드는 [기록 내보내기]로 따로 보관하세요.</div>
+<div class="layout">
+  <aside class="side" aria-label="단원 목차">
+    <div class="side-title">단원</div>
+    <nav id="chlist"></nav>
+    <div class="side-foot">
+      <button class="btn" id="btn-export" type="button">기록 내보내기 (JSON)</button>
+      <button class="btn" id="btn-import" type="button">기록 불러오기</button>
+      <input type="file" id="file" accept=".json,application/json" hidden>
+      <div class="diffsum" id="iostatus" aria-live="polite"></div>
+    </div>
+  </aside>
+  <main class="main"><div class="main-inner" id="content"></div></main>
+</div>
+<div class="scrim" id="scrim"></div>
+<script>
+/* 가벼운 마크다운 변환 + 파이썬 정적 하이라이트 (외부 라이브러리 없음) */
+(function () {
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+  var KW = 'False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield'.split(' ');
+  var BUILTIN = 'print input int float str bool list tuple dict set len range type open sum min max abs round sorted reversed enumerate zip map filter isinstance super object self format append insert remove pop index count extend keys values items get'.split(' ');
+  var KWS = {}, BIS = {};
+  KW.forEach(function (k) { KWS[k] = 1; }); BUILTIN.forEach(function (k) { BIS[k] = 1; });
+
+  function highlight(code) {
+    var out = '', i = 0, n = code.length, prevWord = '';
+    while (i < n) {
+      var c = code[i], m;
+      if (c === '#') { m = /^#[^\n]*/.exec(code.slice(i)); out += '<span class="cm-comment">' + esc(m[0]) + '</span>'; i += m[0].length; continue; }
+      if (c === '"' || c === "'") {
+        var q = c, tri = code.substr(i, 3) === q + q + q, j = i + (tri ? 3 : 1);
+        while (j < n) {
+          if (code[j] === '\\') { j += 2; continue; }
+          if (tri ? code.substr(j, 3) === q + q + q : code[j] === q || code[j] === '\n') { j += tri ? 3 : (code[j] === q ? 1 : 0); break; }
+          j++;
+        }
+        out += '<span class="cm-string">' + esc(code.slice(i, j)) + '</span>'; i = j; continue;
+      }
+      m = /^\d+(\.\d+)?([eE][+-]?\d+)?/.exec(code.slice(i));
+      if (m && !/[\w]/.test(code[i - 1] || '')) { out += '<span class="cm-number">' + m[0] + '</span>'; i += m[0].length; continue; }
+      m = /^[A-Za-z_À-￿][\wÀ-￿]*/.exec(code.slice(i));
+      if (m) {
+        var w = m[0], cls = '';
+        if (KWS[w]) cls = 'cm-keyword'; else if (prevWord === 'def' || prevWord === 'class') cls = 'cm-def'; else if (BIS[w] && code[i + w.length] === '(') cls = 'cm-builtin';
+        out += cls ? '<span class="' + cls + '">' + esc(w) + '</span>' : esc(w);
+        prevWord = w; i += w.length; continue;
+      }
+      if (!/\s/.test(c)) prevWord = '';
+      out += esc(c); i++;
+    }
+    return out;
+  }
+
+  function inline(s) {
+    s = esc(s);
+    var codes = [];
+    s = s.replace(/`([^`]+)`/g, function (_, c) { codes.push(c); return '\u0000' + (codes.length - 1) + '\u0000'; });
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    s = s.replace(/(^|[\s(])(https?:\/\/[^\s)<]+)/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+    return s.replace(/\u0000(\d+)\u0000/g, function (_, i) { return '<code>' + codes[+i] + '</code>'; });
+  }
+
+  function codeBlockHtml(code, label) {
+    return '<div class="codeblock">' + (label ? '<div class="cb-bar">' + label + '</div>' : '') +
+      '<pre><code>' + highlight(code) + '</code></pre></div>';
+  }
+
+  // 목록(들여쓰기 중첩 포함), 코드펜스, 인용, 문단
+  function render(text) {
+    var lines = String(text || '').replace(/\r/g, '').split('\n'), i = 0, html = '';
+    function indentOf(l) { return /^ */.exec(l)[0].length; }
+    function listAt(indent) {
+      var m0 = /^\s*(?:([-*])|(\d+)\.)\s+/.exec(lines[i]);
+      var ordered = !!m0[2], out = ordered ? '<ol>' : '<ul>';
+      while (i < lines.length) {
+        var l = lines[i], m = /^(\s*)(?:([-*])|(\d+)\.)\s+(.*)$/.exec(l);
+        if (!m || m[1].length < indent) break;
+        if (m[1].length > indent) break;
+        var item = inline(m[4]); i++;
+        var extra = '';
+        while (i < lines.length) {
+          var n = lines[i];
+          if (/^\s*$/.test(n)) break;
+          var nm = /^(\s*)(?:[-*]|\d+\.)\s+/.exec(n);
+          if (nm && nm[1].length > indent) { extra += listAt(nm[1].length); continue; }
+          if (nm) break;
+          if (indentOf(n) > indent) { item += ' ' + inline(n.trim()); i++; continue; }
+          break;
+        }
+        out += '<li>' + item + extra + '</li>';
+      }
+      return out + (ordered ? '</ol>' : '</ul>');
+    }
+    while (i < lines.length) {
+      var l = lines[i];
+      if (/^\s*$/.test(l)) { i++; continue; }
+      var fence = /^```(\w*)\s*$/.exec(l);
+      if (fence) {
+        var buf = []; i++;
+        while (i < lines.length && !/^```\s*$/.test(lines[i])) buf.push(lines[i++]);
+        i++; html += codeBlockHtml(buf.join('\n')); continue;
+      }
+      var h = /^(#{1,4})\s+(.*)$/.exec(l);
+      if (h) { var lv = Math.min(h[1].length + 2, 6); html += '<h' + lv + '>' + inline(h[2]) + '</h' + lv + '>'; i++; continue; }
+      if (/^>\s?/.test(l)) {
+        var q = [];
+        while (i < lines.length && /^>\s?/.test(lines[i])) q.push(lines[i++].replace(/^>\s?/, ''));
+        html += '<blockquote>' + render(q.join('\n')) + '</blockquote>'; continue;
+      }
+      if (/^\s*(?:[-*]|\d+\.)\s+/.test(l)) { html += listAt(indentOf(l)); continue; }
+      var para = [];
+      while (i < lines.length && !/^\s*$/.test(lines[i]) && !/^```/.test(lines[i]) && !/^\s*(?:[-*]|\d+\.)\s+/.test(lines[i]) && !/^#{1,4}\s/.test(lines[i])) para.push(lines[i++]);
+      html += '<p>' + inline(para.join(' ')) + '</p>';
+    }
+    return html;
+  }
+
+  var api = { render: render, highlight: highlight, esc: esc, codeBlock: codeBlockHtml };
+  if (typeof window !== 'undefined') window.PLMd = api;
+  if (typeof module !== 'undefined') module.exports = api;
+})();
+
+</script>
+<script>
+var COURSE = {"chapters": [{"no": 1, "title": "파이썬 개요", "concept": [{"title": "특징", "blocks": [{"t": "md", "text": "- 1990년대 초기에 개발됨\n- 스크립트 언어: 배우기 쉽고 프로그래밍이 쉬움\n- 문법이 자연어에 가까움\n- 객체지향 언어 (클래스, 상속, …)\n- 다양한 라이브러리 (머신러닝, 시각화, 데이터분석, 웹크롤링, …) — numpy, pandas, tensorflow, pyqt 등\n- 인터프리트 방식: 컴파일 없이 라인 단위로 번역 및 실행\n- 고급 언어(자연어에 가까움: C++, java, Perl, C, …) ↔ 저급 언어(기계어에 가까움: 어셈블리, 기계어)"}]}, {"title": "개발 환경", "blocks": [{"t": "md", "text": "1. IDLE — python.org → downloads\n2. Spyder — spyder-ide.org → download\n3. PyCharm — jetbrains.com → download\n4. 온라인 사이트"}]}], "practice": [], "examples": [], "labs": [{"id": "c01-l1", "title": "실습1", "prompt": "당신의 이름을 출력하십시오", "notes": []}]}, {"no": 2, "title": "변수, 입출력, 연산자", "concept": [{"title": "변수", "blocks": [{"t": "md", "text": "- 값(value)을 가질 수 있으며, 값은 변경될 수 있다."}, {"t": "code", "code": "x = 3\ny = 4.2\ny = 3 * x\ny = 5", "pid": "c02-p01"}, {"t": "md", "text": "- value의 유형\n  - integer: 0, 3, 4, -2, -5, …\n  - float: 0.0, 3.0, 2.4, 1.52, …\n  - boolean: True, False\n  - string(문자열): 'abc', \"ab hdfas\", \"010-2822-2222\", 's234', …\n- 변수의 유형을 지정할 필요 없이 다양한 유형의 값을 할당할 수 있다."}, {"t": "code", "code": "x = 3\nx = 3.2\nx = 'ab'\nx = True      # No problem!!", "pid": "c02-p02"}]}, {"title": "type() 함수", "blocks": [{"t": "md", "text": "- value의 유형(type)을 반환한다.\n- 연습: `type(5)`, `type(3.0)`, `type(True)`, `type(\"abc\")`"}]}, {"title": "print() 함수", "blocks": [{"t": "md", "text": "- 인자로 전달된 값들을 표준출력(모니터)에 출력한다.\n- 연습"}, {"t": "code", "code": "print('python')\nprint(33)\nprint('python', 'is', 'interesting')\nprint('python', 3)\nprint(type(5))\nprint(type(3.0))", "pid": "c02-p03"}, {"t": "md", "text": "- 변수의 값도 출력 가능"}, {"t": "code", "code": "x = 1\nprint(x)\ny = x + 1\nprint(y)\nstr1 = 'abc'\nprint(str1)\nprint(\"test\", x, y, str1)", "pid": "c02-p04"}]}, {"title": "형변환", "blocks": [{"t": "md", "text": "- 인자로 전달된 값의 type을 다른 type으로 변경하는 함수: `float(value)`, `int(value)`, `str(value)`"}, {"t": "code", "code": "x = float(3)\nprint(x)\nprint(type(x))\n\nx = int(3.9)\nprint(x)\nprint(type(x))\n\nx = str(3.9)\nprint(x)\nprint(type(x))", "pid": "c02-p05"}]}, {"title": "대입 연산", "blocks": [{"t": "md", "text": "- 변수에 값을 저장하는 연산, 연산자: `=`"}, {"t": "code", "code": "a = 3\nb = 4.14\nc = \"abc\"\na = 3\nb = a\nd = k      # k가 정의되기 전이라 에러\nk = 3", "pid": "c02-p06"}]}, {"title": "산술 연산", "blocks": [{"t": "md", "text": "- `+`, `-`\n- `*` : 곱셈\n- `/` : 나눗셈, 결과는 float (예: 1/2 => 0.5)\n- `//` : 나눗셈의 몫 (예: 1//2 => 0)\n- `%` : 나눗셈의 나머지 (예: 2%3 => 2)\n- `**` : 지수 연산 (예: 2 ** 3 => 8)\n- 연습 (각각 실행하고 print()로 변수의 값 출력)"}, {"t": "code", "code": "a = 3\nb = 2\nc = a + b\nc = a - b\nc = a * b\nc = a / b\nc = a // b\nc = a % b\nc = a ** b\na = a + 1\na += 1       # a = a + 1 과 같음", "pid": "c02-p07"}, {"t": "md", "text": "- 연산자 우선순위: `**` > `*, /, //, %` > `+, -` > `=`"}, {"t": "code", "code": "a = 3\nb = 2\nc = 5\nd = a + b * c\ne = a + b * c ** d\ne = a + (b * (c ** d))", "pid": "c02-p08"}]}, {"title": "문자열 관련 연산", "blocks": [{"t": "md", "text": "- 문자열 결합 `+`"}, {"t": "code", "code": "str1 = 'hi'\nstr2 = 'python'\nstr3 = str1 + str2\nstr4 = str1 + \" \" + str2", "pid": "c02-p09"}, {"t": "md", "text": "- 반복 `*`"}, {"t": "code", "code": "str1 = 'hi'\nstr2 = str1 * 3", "pid": "c02-p10"}]}, {"title": "input()", "blocks": [{"t": "md", "text": "- 키보드에서 사용자 입력을 받아 **문자열로 반환**한다.\n- 문자열이 인자로 전달되면 그 문자열이 먼저 화면에 출력된다."}, {"t": "code", "code": "text = input(\"type something: \")\nprint(text)\nprint(type(text))", "pid": "c02-p11"}, {"t": "md", "text": "- 문자열이므로 숫자와 더할 수 없다 (에러 확인용)"}, {"t": "code", "code": "num1 = input()\nprint(type(num1))\nnum2 = num1 + 1      # TypeError\nprint(num2)", "pid": "c02-p12"}, {"t": "code", "code": "num1 = input()\nprint(type(num1))\nnum2 = num1 + 'a'    # 문자열끼리라 가능\nprint(num2)", "pid": "c02-p13"}, {"t": "md", "text": "- 문자열을 int, float와 같은 숫자로 바꾸려면?"}, {"t": "code", "code": "num1 = input('input 1st number: ')        # type 3\nnum1 = int(num1)\nnum2 = int(input('input 2nd number: '))   # type 4\nnum3 = num1 * num2\nprint(num3)", "pid": "c02-p14"}]}, {"title": "요약", "blocks": [{"t": "md", "text": "- print(): 화면에 값 출력 / input(): 키보드에서 값을 읽고 문자열로 반환\n- type: int, float, str, bool, … / 형변환 int(), float(), str()\n- 변수는 임의 타입의 값을 가질 수 있고 값은 변경될 수 있다."}]}], "practice": [{"id": "c02-p01", "title": "변수 (1/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "x = 3\ny = 4.2\ny = 3 * x\ny = 5", "notes": []}, {"id": "c02-p02", "title": "변수 (2/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "x = 3\nx = 3.2\nx = 'ab'\nx = True      # No problem!!", "notes": []}, {"id": "c02-p03", "title": "print() 함수 (1/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "print('python')\nprint(33)\nprint('python', 'is', 'interesting')\nprint('python', 3)\nprint(type(5))\nprint(type(3.0))", "notes": []}, {"id": "c02-p04", "title": "print() 함수 (2/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "x = 1\nprint(x)\ny = x + 1\nprint(y)\nstr1 = 'abc'\nprint(str1)\nprint(\"test\", x, y, str1)", "notes": []}, {"id": "c02-p05", "title": "형변환", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "x = float(3)\nprint(x)\nprint(type(x))\n\nx = int(3.9)\nprint(x)\nprint(type(x))\n\nx = str(3.9)\nprint(x)\nprint(type(x))", "notes": []}, {"id": "c02-p06", "title": "대입 연산", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "a = 3\nb = 4.14\nc = \"abc\"\na = 3\nb = a\nd = k      # k가 정의되기 전이라 에러\nk = 3", "notes": []}, {"id": "c02-p07", "title": "산술 연산 (1/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "a = 3\nb = 2\nc = a + b\nc = a - b\nc = a * b\nc = a / b\nc = a // b\nc = a % b\nc = a ** b\na = a + 1\na += 1       # a = a + 1 과 같음", "notes": []}, {"id": "c02-p08", "title": "산술 연산 (2/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "a = 3\nb = 2\nc = 5\nd = a + b * c\ne = a + b * c ** d\ne = a + (b * (c ** d))", "notes": []}, {"id": "c02-p09", "title": "문자열 관련 연산 (1/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "str1 = 'hi'\nstr2 = 'python'\nstr3 = str1 + str2\nstr4 = str1 + \" \" + str2", "notes": []}, {"id": "c02-p10", "title": "문자열 관련 연산 (2/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "str1 = 'hi'\nstr2 = str1 * 3", "notes": []}, {"id": "c02-p11", "title": "input() (1/4)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "text = input(\"type something: \")\nprint(text)\nprint(type(text))", "notes": []}, {"id": "c02-p12", "title": "input() (2/4)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "num1 = input()\nprint(type(num1))\nnum2 = num1 + 1      # TypeError\nprint(num2)", "notes": []}, {"id": "c02-p13", "title": "input() (3/4)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "num1 = input()\nprint(type(num1))\nnum2 = num1 + 'a'    # 문자열끼리라 가능\nprint(num2)", "notes": []}, {"id": "c02-p14", "title": "input() (4/4)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "num1 = input('input 1st number: ')        # type 3\nnum1 = int(num1)\nnum2 = int(input('input 2nd number: '))   # type 4\nnum3 = num1 * num2\nprint(num3)", "notes": []}], "examples": [], "labs": [{"id": "c02-l1", "title": "실습1", "prompt": "학번과 이름을 각각 다른 줄에 출력하는 프로그램을 작성하세요.", "notes": []}, {"id": "c02-l2", "title": "실습2", "prompt": "사용자로부터 두 개의 정수를 입력 받아서, 곱한 결과를 출력하시오.\n\n- 5\n- 7\n- The result is 35", "notes": []}, {"id": "c02-l3", "title": "실습3", "prompt": "사용자로부터 두 개의 정수를 입력 받아서, 나눈 결과를 출력하시오.\n\n- 2\n- 4\n- the result is 0.5", "notes": []}, {"id": "c02-l4", "title": "실습4", "prompt": "사용자로부터 두 개의 정수를 입력 받아서, 나눗셈의 나머지를 출력하시오.\n\n- 12\n- 5\n- the result is 2", "notes": []}]}, {"no": 3, "title": "조건문", "concept": [{"title": "개요", "blocks": [{"t": "md", "text": "- If …, then do A. Otherwise do B."}]}, {"title": "if 문 문법", "blocks": [{"t": "code", "code": "if <condition> :\n    <expression>\n    <expression>\nelif <condition> :\n    <expression>\nelif <condition> :\n    <expression>\nelse :\n    <expression>", "template": true}, {"t": "md", "text": "- 들여쓰기가 중요. 들여쓰기는 if 문의 시작과 끝을 나타냄.\n- elif는 여러 개 사용 가능하며 생략할 수도 있다.\n- else는 한 개만 사용하거나 생략할 수 있다.\n- (if / if-elif / if-else / if-elif-else 등 다양한 조합 가능, 중첩 가능)"}]}, {"title": "비교연산자", "blocks": [{"t": "md", "text": "- `a>b`, `a>=b`, `a<b`, `a<=b`\n- `a == b` : a와 b의 값이 같을 때 참\n- `a != b` : a와 b의 값이 다를 때 참"}]}, {"title": "논리 연산자", "blocks": [{"t": "md", "text": "- `a and b` : a와 b가 모두 참이면 참\n- `a or b` : a 또는 b가 참이면 참\n- `not a` : a가 거짓이면 참"}]}, {"title": "if 문의 중첩", "blocks": [{"t": "code", "code": "if num1 > 0 :\n    if num2 > 0 :\n        print('both are positive')\n    else :\n        print('only num1 is positive')\nelse :\n    …", "template": true}]}, {"title": "요약", "blocks": [{"t": "md", "text": "- if문: 들여쓰기를 지켜야 함. 여러 개의 elif와 하나의 else\n- 비교 연산자: `<, >, <=, >=, !=, ==` / 논리 연산자: `and, or, not`\n- if 문의 중첩: 가능하지만 권장하지는 않음"}]}], "practice": [], "examples": [{"id": "c03-e1", "title": "예시1", "prompt": "정수를 입력받아 짝수인지 홀수인지 출력하는 프로그램을 작성하세요.\n\n- 짝수 또는 홀수?\n- if 문을 사용하여 각 경우를 출력", "reference": [{"label": "교재 정답", "code": "num = int(input('input a number'))\nif num % 2 == 0:\n    print(num, 'is even')\nelse :\n    print(num, 'is odd')"}], "notes": []}, {"id": "c03-e2", "title": "예시2", "prompt": "온도(float)를 사용자로부터 입력받고, 온도가 18.0 ~ 25.0이면 “good”, 그렇지 않으면 “warning”을 출력하시오.\n\n- temperature >= 18.0 and temperature <= 25.0", "reference": [{"label": "교재 정답", "code": "temp = float(input('input a temperature'))\nif temp >= 18.0 and temp <= 25.0 :\n    print('good')\nelse :\n    print('warning')"}], "notes": []}], "labs": [{"id": "c03-l1", "title": "실습1", "prompt": "정수를 입력받아 3의 배수이면 '3의 배수입니다'를, 그렇지 않으면 '3의 배수가 아닙니다'를 출력하는 프로그램을 작성하시오.", "notes": []}, {"id": "c03-l2", "title": "실습2", "prompt": "정수를 입력받아 양수면 '양수', 음수면 '음수', 0이면 '0'을 출력하는 프로그램을 작성하시오.", "notes": []}, {"id": "c03-l3", "title": "실습3", "prompt": "점수(정수)를 입력받아 성적(A, B, C, D, 또는 F)을 출력하는 프로그램을 작성하시오.\n\n- (A : 100-80, B: 79-60, C: 59-40, D: 39-20, F: 19-0)\n- 0 ~ 100이외의 정수가 입력되면, “error”를 출력한다.", "notes": []}, {"id": "c03-l4", "title": "실습4", "prompt": "세 개의 실수를 입력받아 가장 큰 수를 출력하는 프로그램을 작성하시오.", "notes": []}, {"id": "c03-l5", "title": "실습5", "prompt": "사용자로부터 연도를 입력받아 윤년인지 판단합니다. 윤년이면 '윤년'을, 그렇지 않으면 '윤년이 아님'을 출력하세요.\n\n- 만약 음수가 입력되면, “error”를 출력한다.\n\n규칙\n- 400의 배수: 윤년\n- 4의 배수이나 100의 배수가 아님: 윤년\n- 그 외의 경우: 윤년이 아님\n\n예\n- 400, 800, … : 윤년\n- 100,200,300,500,… : 윤년이 아님\n- 4, 8, 12, 16 : 윤년\n- 1, 2, 3, 5 : 윤년이 아님\n- -4 : error", "notes": []}]}, {"no": 4, "title": "while 반복문", "concept": [{"title": "개요", "blocks": [{"t": "md", "text": "- 때로는 일부 명령문을 여러 번 실행해야 한다.\n  - 이름을 100번 출력 / 1부터 100까지의 합 / 'q'를 입력할 때까지 정수를 받고 합계 계산\n- Python의 반복문: while, for\n  - while: 조건이 참인 동안 반복\n  - for: 주어진 여러 데이터에 대해 반복"}]}, {"title": "문법", "blocks": [{"t": "code", "code": "while (조건) :\n    명령문\n    명령문\n    …", "template": true}, {"t": "md", "text": "- 들여쓰기가 중요하다. 조건이 참일 동안 내부 명령들을 실행한다."}]}, {"title": "중첩", "blocks": [{"t": "md", "text": "- while 반복문은 다른 반복문이나 if문을 포함할 수 있다."}, {"t": "code", "code": "while 조건 :\n    while 조건 :\n        명령문\n    if 조건 :\n        명령문\n    명령문", "template": true}]}, {"title": "주의: 무한 루프", "blocks": [{"t": "code", "code": "while True :\n    명령문", "template": true}]}, {"title": "break / continue", "blocks": [{"t": "md", "text": "- `break`: 반복문을 빠져나간다."}, {"t": "code", "code": "while True :\n    …\n    if (조건) :\n        break\n    명령문", "template": true}, {"t": "md", "text": "- `continue`: 반복문의 시작으로 돌아간다."}, {"t": "code", "code": "while 조건 :\n    …\n    if 조건 :\n        continue\n    명령문", "template": true}]}, {"title": "랜덤 정수 생성", "blocks": [{"t": "code", "code": "import random\nnumber = random.randint(1, 100)   # 1 – 100 난수 발생", "pid": "c04-p01"}]}, {"title": "요약", "blocks": [{"t": "md", "text": "- while: 조건이 참일 동안 내부 명령문 반복 실행, 다른 반복문/if문 포함 가능, 무한 반복문 주의\n- break: 반복문 종료 / continue: 반복문 시작으로 돌아감"}]}], "practice": [{"id": "c04-p01", "title": "랜덤 정수 생성", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import random\nnumber = random.randint(1, 100)   # 1 – 100 난수 발생", "notes": []}], "examples": [{"id": "c04-e1", "title": "예제1", "prompt": "이름 10번 출력하기\n\n```python\nwhile (condition) :\n       print('Ilhoon Shin')\n```\n\n어떻게 10번 반복하게 만들 것인가?", "reference": [{"label": "교재 정답", "code": "count = 0\nwhile count < 10 :\n    print('Ilhoon Shin')\n    count += 1"}], "notes": []}, {"id": "c04-e2", "title": "예제2", "prompt": "1에서 100까지의 합 계산하기\n\n- At 1st round, we have to add 1.\n- At 2nd round, we have to add 2.\n- At 3rd round, we have to add 3.\n- …\n- At 100th round, we have to add 100.\n\nCan you find some patterns?\n1. 100번 반복\n2. 숫자는 1부터 100까지 증가한다.\n\n```python\ncount = 1\nwhile count <= 100 :\n        …\n        count += 1\n```", "reference": [{"label": "교재 정답", "code": "sum = 0\ncount = 1\n\nwhile count <= 100 :\n    sum += count\n    count += 1\n\nprint(sum)"}], "notes": []}], "labs": [{"id": "c04-l1", "title": "실습1", "prompt": "1에서 100 사이의 3의 배수를 출력하시오.", "notes": []}, {"id": "c04-l2", "title": "실습2", "prompt": "10개의 정수를 입력받아 그 합을 출력하시오.", "notes": []}, {"id": "c04-l3", "title": "실습3", "prompt": "자연수를 입력받아 그 수의 약수를 모두 출력하시오.\n\n- 0이나 음수가 입력되면 에러 메시지를 출력한다.", "notes": []}, {"id": "c04-l4", "title": "실습4", "prompt": "숫자 맞추기 프로그램을 작성하시오.\n\n- 1에서 100 사이의 랜덤 정수를 생성한다.\n- 사용자는 맞출 때까지 숫자를 입력받는다.\n- 입력한 숫자가 랜덤 숫자보다 크면 프로그램은 “low\"를 출력한다.\n- 입력한 숫자가 랜덤 숫자보다 작으면 프로그램은 “high\"를 출력한다.\n\n랜덤 정수를 생성하는 방법\n\n```python\nimport random # import random 라이브러리.\n\nnumber = random.randint(1, 100) # 1 – 100 난수 발생\n```", "notes": []}]}, {"no": 5, "title": "for 반복문", "concept": [{"title": "개요", "blocks": [{"t": "md", "text": "- 일련의 값들이 주어지며, 값의 개수만큼 반복 실행된다. 각 라운드마다 각각의 값이 활용된다."}, {"t": "code", "code": "for 변수 in a list of values :\n    명령문", "template": true}, {"t": "md", "text": "- 값들의 리스트 또는 문자열이 사용될 수 있다."}]}, {"title": "예시", "blocks": [{"t": "code", "code": "for num in [1, 2, 3, 4] :   # 4번 반복: num = 1, 2, 3, 4\n    명령문\n\nfor mychar in 'abc' :        # 3번 반복: mychar = 'a', 'b', 'c'\n    statement", "template": true}]}, {"title": "range()", "blocks": [{"t": "md", "text": "- `range(start, stop, step)`: start부터 stop-1까지의 숫자\n- start 생략 시 기본값 0, step 생략 시 기본값 1\n- `range(1, 5, 1)` → [1, 2, 3, 4]\n- `range(1, 5, 2)` → [1, 3]\n- `range(5)` → [0, 1, 2, 3, 4]\n- `range(4, 6)` → [4, 5]"}]}], "practice": [], "examples": [{"id": "c05-e1", "title": "예제1", "prompt": "당신의 이름을 100번 출력하는 프로그램을 작성하시오.\n\n```python\nfor num in [1, 2, 3, …, 100] :\n        print('Ilhoon Shin')\n```\n\n1, 2, 3, …, 100을 직접 쓰는 것은 비효율적이다.", "reference": [{"label": "교재 정답", "code": "for num in range(100) :\n    print('Ilhoon Shin')"}], "notes": []}], "labs": [{"id": "c05-l1", "title": "실습1", "prompt": "1과 100 사이의 3의 배수(3, 6, 9, 12, …)의 합을 출력하는 프로그램을 작성하시오.", "notes": []}, {"id": "c05-l2", "title": "실습2", "prompt": "주사위를 100번 굴렸을 때 숫자 6이 나온 횟수를 출력하는 프로그램을 작성하시오.", "notes": []}, {"id": "c05-l3", "title": "실습3", "prompt": "두 주사위를 굴렸을 때 두 숫자가 같을 확률을 계산하시오.\n\n- 수학적인 방법은 사용하지 마시오.\n- 프로그램을 이용하여 근사값을 구하시오.", "notes": []}, {"id": "c05-l4", "title": "실습4", "prompt": "실수 10개를 입력받아 그 중 가장 큰 수를 출력하는 프로그램을 작성하시오.\n\n- float('-inf')", "notes": []}]}, {"no": 6, "title": "문자열", "concept": [{"title": "목차", "blocks": [{"t": "md", "text": "문자열 길이, 인덱싱, 슬라이싱, in / not in, count(), find(), replace(), 기타 (islower() 등)"}]}, {"title": "문자열 길이", "blocks": [{"t": "code", "code": "length = len('abc')\nprint(length)", "pid": "c06-p01"}]}, {"title": "인덱싱", "blocks": [{"t": "md", "text": "- `[]` 사용, 인덱스는 0부터 시작, 음수 인덱스는 마지막 요소부터"}, {"t": "code", "code": "s = 'abc'\nprint(s[0])\nprint(s[1])\nprint(s[2])\nprint(s[-1])\nprint(s[-2])\nprint(s[-3])", "pid": "c06-p02"}]}, {"title": "슬라이싱", "blocks": [{"t": "md", "text": "- `[start:stop:step]`, start에서 stop-1까지\n- start 기본값 0, stop 기본값 문자열 길이, step 기본값 1"}, {"t": "code", "code": "s = '01234567'\nprint(s[3:6:1])\nprint(s[3:6:])\nprint(s[2::])\nprint(s[::])\nprint(s[3:6:2])\nprint(s[3:-1:1])\nprint(s[6:3:-1])\nprint(s[::-1])", "pid": "c06-p03"}]}, {"title": "in / not in", "blocks": [{"t": "md", "text": "- `s1 in s2`: s1이 s2 안에 있으면 True, 아니면 False\n- `s1 not in s2`: s1이 s2 안에 있으면 False, 아니면 True"}, {"t": "code", "code": "s1 = 'a'\ns2 = 'bc'\nif s1 in s2 :\n    print('found')\nelse :\n    print('not found')\n\nif s1 not in s2 :\n    print('not found')\nelse :\n    print('found')", "pid": "c06-p04"}]}, {"title": "count()", "blocks": [{"t": "md", "text": "- `s1.count(s2, start=0, end=len(s1))`: s1에서 s2의 개수 반환 (start부터 end-1까지). 없으면 0."}, {"t": "code", "code": "s = 'abcdea'\ncount = s.count('a')\nprint(count)\ncount = s.count('a', 0, 5)\nprint(count)\ncount = s.count('a', 0, 6)\nprint(count)", "pid": "c06-p05"}]}, {"title": "find()", "blocks": [{"t": "md", "text": "- `s1.find(s2, start=0, end=len(s1))`: s2의 첫 번째 인덱스 반환. 없으면 -1."}, {"t": "code", "code": "s = 'abcdea'\nindex = s.find('ab')\nprint(index)\nindex = s.find('ab', 1)\nprint(index)\n\ns = 'abcdeab'\nindex = s.find('ab', 1)\nprint(index)\nindex = s.find('ab', 1, 6)\nprint(index)", "pid": "c06-p06"}]}, {"title": "replace()", "blocks": [{"t": "md", "text": "- `s.replace(s1, s2, count=-1)`: s에서 s1을 s2로 대체한 **새 문자열** 반환. 원본(s)은 변경되지 않음."}, {"t": "code", "code": "s = 'a b c d'\nms = s.replace(' ', '-')\nprint(s, ms)\nms = s.replace(' ', '-', 2)\nprint(s, ms)", "pid": "c06-p07"}]}, {"title": "split()", "blocks": [{"t": "md", "text": "- `s.split(seq=None, max_split=-1)`: 구분자로 문자열을 나누어 리스트로 반환"}, {"t": "code", "code": "s = 'a b c d'\nslist = s.split(' ')\nprint(slist)\nslist = s.split(' ', 2)\nprint(slist)\nslist = s.split()\nprint(slist)", "pid": "c06-p08"}]}, {"title": "기타 메서드", "blocks": [{"t": "md", "text": "- `s.upper()`: 소문자 → 대문자\n- `s.lower()`: 대문자 → 소문자\n- `s.islower()`: 모든 문자가 소문자면 True\n- `s.isupper()`: 모든 문자가 대문자면 True\n- `s.isalnum()`: 모든 문자가 알파벳 또는 숫자면 True\n- `s.isalpha()`: 모든 문자가 알파벳이면 True\n- `s.isdigit()`: 모든 문자가 숫자면 True\n- `s.isspace()`: 모든 문자가 공백이면 True"}]}], "practice": [{"id": "c06-p01", "title": "문자열 길이", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "length = len('abc')\nprint(length)", "notes": []}, {"id": "c06-p02", "title": "인덱싱", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "s = 'abc'\nprint(s[0])\nprint(s[1])\nprint(s[2])\nprint(s[-1])\nprint(s[-2])\nprint(s[-3])", "notes": []}, {"id": "c06-p03", "title": "슬라이싱", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "s = '01234567'\nprint(s[3:6:1])\nprint(s[3:6:])\nprint(s[2::])\nprint(s[::])\nprint(s[3:6:2])\nprint(s[3:-1:1])\nprint(s[6:3:-1])\nprint(s[::-1])", "notes": []}, {"id": "c06-p04", "title": "in / not in", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "s1 = 'a'\ns2 = 'bc'\nif s1 in s2 :\n    print('found')\nelse :\n    print('not found')\n\nif s1 not in s2 :\n    print('not found')\nelse :\n    print('found')", "notes": []}, {"id": "c06-p05", "title": "count()", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "s = 'abcdea'\ncount = s.count('a')\nprint(count)\ncount = s.count('a', 0, 5)\nprint(count)\ncount = s.count('a', 0, 6)\nprint(count)", "notes": []}, {"id": "c06-p06", "title": "find()", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "s = 'abcdea'\nindex = s.find('ab')\nprint(index)\nindex = s.find('ab', 1)\nprint(index)\n\ns = 'abcdeab'\nindex = s.find('ab', 1)\nprint(index)\nindex = s.find('ab', 1, 6)\nprint(index)", "notes": []}, {"id": "c06-p07", "title": "replace()", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "s = 'a b c d'\nms = s.replace(' ', '-')\nprint(s, ms)\nms = s.replace(' ', '-', 2)\nprint(s, ms)", "notes": []}, {"id": "c06-p08", "title": "split()", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "s = 'a b c d'\nslist = s.split(' ')\nprint(slist)\nslist = s.split(' ', 2)\nprint(slist)\nslist = s.split()\nprint(slist)", "notes": []}], "examples": [{"id": "c06-e1", "title": "예제1", "prompt": "사용자로부터 입력 받은 문자열에서 모든 모음을 제거하고 수정된 문자열을 출력하는 프로그램을 작성하시오.", "reference": [{"label": "교재 정답", "code": "s = input('input a string: ')\nvowels = 'aeiouAEIOU'\nresult = ''\nfor letter in s:\n    if letter not in vowels:\n        result += letter\nprint(result)"}], "notes": []}], "labs": [{"id": "c06-l1", "title": "실습1", "prompt": "두 문자열을 입력받아 두 번째 문자열이 첫 번째 문자열에서 나타나는 처음 인덱스를 출력하는 프로그램을 작성하시오. 단, 두 번째 문자열을 찾지 못하면 -1을 출력한다.\n\n- 첫 번째 문자열: how are you doing? You are …\n- 두 번째 문자열: are\n- 출력: 4", "notes": []}, {"id": "c06-l2", "title": "실습2", "prompt": "두 문자열을 입력받아 두 번째 문자열이 첫 번째 문자열에서 나타나는 모든 인덱스를 출력하는 프로그램을 작성하시오. 단, 두 번째 문자열을 찾지 못하면 -1을 출력한다.\n\n- 첫 번째 문자열: are are\n- 두 번째 문자열: are\n- 출력: 0\n       4", "notes": []}, {"id": "c06-l3", "title": "실습3", "prompt": "문자열을 입력받아 모음의 개수를 출력하는 프로그램을 작성하시오.", "notes": []}, {"id": "c06-l4", "title": "실습4", "prompt": "010-0000-0000 형식의 휴대폰 번호를 입력받아 '-'를 제거하고 0100000000 형태로 출력하는 프로그램을 작성하시오.", "notes": []}]}, {"no": 7, "title": "함수", "concept": [{"title": "함수란?", "blocks": [{"t": "md", "text": "- 어떤 작업을 수행한다.\n- 입력값(인자/매개변수)을 받을 수 있다 (필수 아님).\n- 결과값을 반환할 수 있다 (필수 아님).\n- 지금까지 사용한 함수: print(), input(), int(), float(), len(), …\n- 프로그래머는 자신만의 함수를 정의해서 사용할 수 있다."}]}, {"title": "함수를 쓰는 이유", "blocks": [{"t": "md", "text": "- 매번 직접 구현하면: 어려움, 시간 소모, 중복 구현(긴 코드), 생산성 저하, 가독성·이해도 저하, 유지 비용 증가\n- 추상화의 수단: 함수 본문을 알 필요 없음 (블랙 박스)\n- 모듈화의 수단: 큰 프로그램을 작은 클래스와 함수들의 조합으로 구성 (레고 블록)"}]}, {"title": "함수 정의", "blocks": [{"t": "md", "text": "- 구성 요소: 이름, 매개변수(0개 이상), 반환 값(0개 이상), 함수 내용"}, {"t": "code", "code": "def func_name(parameters) :\n    statement\n    statement\n    …\n    return values", "template": true}]}], "practice": [], "examples": [{"id": "c07-e1", "title": "예제1", "prompt": "두 정수를 매개 변수로 받아서 그 곱셈 결과를 반환하는 \"multiply\" 함수를 정의하라.", "reference": [{"label": "교재 정답", "code": "def multiply(num1, num2) :\n    result = num1 * num2\n    return result"}], "notes": []}, {"id": "c07-e2", "title": "예제2", "prompt": "사용자로부터 두 정수를 입력받아 그 곱셈 결과를 출력하는 프로그램을 작성하라.\n\n- multiply() 함수를 정의하라.\n- multiply()를 호출하여 곱셈을 수행하라.", "reference": [{"label": "교재 정답", "code": "def multiply(num1, num2) :\n    result = num1 * num2\n    return result\n\nnum1 = int(input('input a number: '))\nnum2 = int(input('input a number: '))\nresult = multiply(num1, num2)\nprint(result)"}], "notes": []}], "labs": [{"id": "c07-l1", "title": "실습1", "prompt": "섭씨 온도를 입력받아 화씨 온도로 변환하는 프로그램을 작성하라.\n\n- cel2fah() 함수를 정의하고 사용하라.\n- 화씨 온도 = (9/5) * 섭씨 온도 + 32", "notes": []}, {"id": "c07-l2", "title": "실습2", "prompt": "num1에서 num2까지의 합을 반환하는 sum_range(num1, num2) 함수를 정의하시오.\n\n- sum_range()를 호출하여 100에서 200까지의 합을 출력하시오.", "notes": []}, {"id": "c07-l3", "title": "실습3", "prompt": "전화번호에서 ‘-’를 제거한 문자열을 반환하는 convert_phonenumber(phone_num) 함수를 정의하라.\n\n- 전화번호를 입력받고 ‘-’를 제거한 후 출력하시오.", "notes": []}, {"id": "c07-l4", "title": "실습4", "prompt": "주어진 문자열에서 특정 문자를 제거하는 convert_string(phone_num, remove_target) 함수를 정의하라.\n\n- 전화번호에서 ‘-’를 제거한 후 출력하라.", "notes": []}, {"id": "c07-l5", "title": "실습5", "prompt": "사용자로부터 자연수를 입력받고, 해당 자연수가 소수인지 아닌지를 판단하는 프로그램을 작성하시오.", "notes": []}]}, {"no": 8, "title": "리스트와 튜플", "concept": [{"title": "튜플 (tuple)", "blocks": [{"t": "md", "text": "- 순서가 있는 데이터들의 collection (리스트와 유사), `()`로 표기: `(1, 2, 3)`, `(1, 'aa')`\n- 인덱스로 값 식별, 각 요소는 서로 다른 타입 가능\n- **Immutable**: `a[0] = 4` (X)"}, {"t": "code", "code": "a = (1, 2, 3)\nprint(a)\nprint(a[0])\nprint(a[1])", "pid": "c08-p01"}]}, {"title": "튜플 연산", "blocks": [{"t": "md", "text": "- 인덱싱, 슬라이싱 `a[start:stop:step]`, 연결 `b = a + (3, 4)`, 크기 `len()` (문자열과 동일)"}, {"t": "code", "code": "a = (0, 1, 'aa', 3)\nprint(a[2])\nprint(a[0:3:2])\nb = a + ('bb', 5)\nprint(b)\nprint(len(b))", "pid": "c08-p02"}]}, {"title": "리스트 (list)", "blocks": [{"t": "md", "text": "- 순서가 있는 값들의 collection, `[]`로 표기: `[1, 2, 3]`, `[1, 'aa']`, `[2]`, `[]`\n- 튜플과의 차이\n  - **Mutable**: `a[0] = 4` (O)\n  - 크기가 고정되지 않음 (append, remove, insert 등으로 확장/축소)"}]}, {"title": "리스트 조작1", "blocks": [{"t": "md", "text": "- 인덱싱, 슬라이싱 `a[start:stop:step]`, 연결 `b = a + [3, 4]`, 크기 `len()`, 합계 `sum()`"}, {"t": "code", "code": "a = [0, 1, 2]\nprint(a[0])\na[0] = -1\nprint(a)\nprint(a[0:2:1])\nb = a + [3, 4]\nprint(b)\nprint(len(b))\nprint(sum(b))", "pid": "c08-p03"}]}, {"title": "리스트 조작2", "blocks": [{"t": "md", "text": "- `append(x)`: 요소 하나 추가 (scalar)\n- `extend([..])`: 리스트를 이어붙임\n- `insert(i, x)`: 인덱스 i에 x 삽입\n- `remove(x)`: 값이 x인 첫 요소 삭제\n- `pop()`: 마지막 요소 삭제 후 반환 / `pop(i)`: 인덱스 i 요소 삭제 후 반환"}, {"t": "code", "code": "b = [0, 1, 2, 3, 4]\nb.append(5)\nprint(b)\nb.extend([6, 7])\nprint(b)\nb.insert(0, -1)\nprint(b)\nb.remove(1)\nprint(b)\nk = b.pop()\nprint(k, b)\nk = b.pop(0)\nprint(k, b)", "pid": "c08-p04"}]}, {"title": "리스트 조작3 — 정렬", "blocks": [{"t": "code", "code": "list = [3, 7, 1, 2]\nlist.sort()            # list = [1, 2, 3, 7]  (원본 변경)\nlist2 = sorted(list)   # 원본은 그대로, 정렬된 새 리스트 반환\nlist.reverse()         # list = [7, 3, 2, 1]", "pid": "c08-p05"}]}, {"title": "리스트 복사", "blocks": [{"t": "md", "text": "- `l2 = l1` → 같은 객체를 가리킴 (alias)"}, {"t": "code", "code": "l1 = [1, 2, 3]\nl2 = l1\nl2.append(4)\nprint(l1, l2)", "pid": "c08-p06"}, {"t": "md", "text": "- 진짜 복사: 슬라이싱 또는 `list()`"}, {"t": "code", "code": "l1 = [1, 2, 3]\nl2 = l1[0:3:1]      # l2 = l1[:] 또는 l1[::]\nl2.append(4)\nl3 = list(l2)\nl3.append(5)\nprint(l1, l2, l3)", "pid": "c08-p07"}]}, {"title": "리스트 ↔ 문자열", "blocks": [{"t": "md", "text": "- 문자열 → 리스트: `list(s)`"}, {"t": "code", "code": "l = list('abc')\nprint(l)", "pid": "c08-p08"}, {"t": "md", "text": "- 문자열 → 리스트 (split)"}, {"t": "code", "code": "s = 'a,b,c,d'\nl = s.split(',')\nprint(l)\ns2 = 'a b c d'\nl2 = s2.split()\nprint(l2)", "pid": "c08-p09"}, {"t": "md", "text": "- 리스트 → 문자열 (join): `s.join(list)` — 리스트 요소는 문자열이어야 하고, s가 요소 사이에 삽입됨"}, {"t": "code", "code": "l = ['a', 'b', 'c']\ns1 = ''.join(l)\ns2 = '_'.join(l)\nprint(s1)\nprint(s2)", "pid": "c08-p10"}]}, {"title": "다차원 리스트", "blocks": [{"t": "md", "text": "- 리스트의 요소는 또 다른 리스트가 될 수 있다."}, {"t": "code", "code": "a = [[1, 2, 3], [4, 5]]\nprint(a)\na.append(6)\nprint(a)", "pid": "c08-p11"}]}], "practice": [{"id": "c08-p01", "title": "튜플 (tuple)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "a = (1, 2, 3)\nprint(a)\nprint(a[0])\nprint(a[1])", "notes": []}, {"id": "c08-p02", "title": "튜플 연산", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "a = (0, 1, 'aa', 3)\nprint(a[2])\nprint(a[0:3:2])\nb = a + ('bb', 5)\nprint(b)\nprint(len(b))", "notes": []}, {"id": "c08-p03", "title": "리스트 조작1", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "a = [0, 1, 2]\nprint(a[0])\na[0] = -1\nprint(a)\nprint(a[0:2:1])\nb = a + [3, 4]\nprint(b)\nprint(len(b))\nprint(sum(b))", "notes": []}, {"id": "c08-p04", "title": "리스트 조작2", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "b = [0, 1, 2, 3, 4]\nb.append(5)\nprint(b)\nb.extend([6, 7])\nprint(b)\nb.insert(0, -1)\nprint(b)\nb.remove(1)\nprint(b)\nk = b.pop()\nprint(k, b)\nk = b.pop(0)\nprint(k, b)", "notes": []}, {"id": "c08-p05", "title": "리스트 조작3 — 정렬", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "list = [3, 7, 1, 2]\nlist.sort()            # list = [1, 2, 3, 7]  (원본 변경)\nlist2 = sorted(list)   # 원본은 그대로, 정렬된 새 리스트 반환\nlist.reverse()         # list = [7, 3, 2, 1]", "notes": []}, {"id": "c08-p06", "title": "리스트 복사 (1/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "l1 = [1, 2, 3]\nl2 = l1\nl2.append(4)\nprint(l1, l2)", "notes": []}, {"id": "c08-p07", "title": "리스트 복사 (2/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "l1 = [1, 2, 3]\nl2 = l1[0:3:1]      # l2 = l1[:] 또는 l1[::]\nl2.append(4)\nl3 = list(l2)\nl3.append(5)\nprint(l1, l2, l3)", "notes": []}, {"id": "c08-p08", "title": "리스트 ↔ 문자열 (1/3)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "l = list('abc')\nprint(l)", "notes": []}, {"id": "c08-p09", "title": "리스트 ↔ 문자열 (2/3)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "s = 'a,b,c,d'\nl = s.split(',')\nprint(l)\ns2 = 'a b c d'\nl2 = s2.split()\nprint(l2)", "notes": []}, {"id": "c08-p10", "title": "리스트 ↔ 문자열 (3/3)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "l = ['a', 'b', 'c']\ns1 = ''.join(l)\ns2 = '_'.join(l)\nprint(s1)\nprint(s2)", "notes": []}, {"id": "c08-p11", "title": "다차원 리스트", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "a = [[1, 2, 3], [4, 5]]\nprint(a)\na.append(6)\nprint(a)", "notes": []}], "examples": [{"id": "c08-e1", "title": "예제1", "prompt": "하나의 튜플을 전달받아, 짝수 인덱스의 값들만 추출하여 튜플로 반환하는 함수 get_even_index()를 정의하시오.", "reference": [{"label": "교재 정답", "code": "def get_even_index(tuple) :\n    count = len(tuple)\n    result = tuple[0:count:2]\n    return result\n\na = (0, 1, 2, 3, 4)\nb = (0, 1, 2, 3)\nprint(get_even_index(a))\nprint(get_even_index(b))"}], "notes": ["교안은 매개변수 이름으로 tuple을 사용합니다(내장 이름을 가리는 방식이라 권장되지는 않습니다)."]}, {"id": "c08-e2", "title": "예제2", "prompt": "사용자로부터 5개의 정수를 입력받아 리스트에 저장하시오.\n\n- 그리고 합계를 출력하시오.", "reference": [{"label": "교재 정답", "code": "numbers = []\nfor count in range(5):\n    num = int(input('input a number'))\n    numbers.append(num)\n\nsum = 0\nfor num in numbers:\n    sum += num\nprint(sum)"}, {"label": "함수로 분리한 버전", "code": "def get_sum(numbers) :\n    sum = 0\n    for num in numbers:\n        sum += num\n    return sum\n\nnumbers = []\nfor count in range(5):\n    num = int(input('input a number'))\n    numbers.append(num)\n\nprint(get_sum(numbers))"}], "notes": []}, {"id": "c08-e3", "title": "예제3", "prompt": "사용자로부터 5개의 정수를 입력받아 리스트에 저장하시오.\n\n- 그리고 오름차순으로 출력하시오.", "reference": [{"label": "교재 정답", "code": "numbers = []\nfor count in range(5):\n    num = int(input('input a number'))\n    numbers.append(num)\n\nnumbers.sort()\nprint(numbers)"}], "notes": []}], "labs": [{"id": "c08-l1", "title": "실습1", "prompt": "사용자로부터 양의 정수를 입력받고, 해당 정수보다 작은 모든 짝수들을 리스트에 저장하시오. 그리고 리스트를 출력하시오.\n\n- if a user types 5, then [2, 4] should be printed.", "notes": []}, {"id": "c08-l2", "title": "실습2", "prompt": "사용자로부터 5 개의 정수를 입력받아 리스트에 저장하고 가장 큰 수를 출력하시오.", "notes": []}, {"id": "c08-l3", "title": "실습3", "prompt": "사용자로부터 양의 정수를 입력받고, 해당 정수보다 작은 모든 소수들을 리스트에 저장하여 출력하시오.", "notes": []}, {"id": "c08-l4", "title": "실습4", "prompt": "두 개의 리스트를 입력받아, 두 리스트에 공통으로 포함된 요소를 담은 새로운 리스트를 만들고 출력하시오.", "notes": []}, {"id": "c08-l5", "title": "실습5", "prompt": "리스트에서 중복된 요소를 제거하고 유일한 요소만 담은 새로운 리스트를 생성하고 출력하시오.", "notes": []}]}, {"no": 9, "title": "딕셔너리 (dictionary)", "concept": [{"title": "개요", "blocks": [{"t": "md", "text": "- (키, 값) 쌍의 집합\n- 키(key): int, float, string, bool, tuple 등 가능, **고유**해야 함\n- 값(value): 무엇이든 가능 (스칼라, 리스트, 튜플, dictionary 등)\n- 요소들 사이에 순서는 없다."}, {"t": "code", "code": "dict1 = {}\ndict2 = {'key1':'value1', 'key2':'value2'}\ndict3 = {0:'value1', 1:'value2'}", "pid": "c09-p01"}]}, {"title": "검색", "blocks": [{"t": "md", "text": "- 키로 검색: `dict1[key]`"}, {"t": "code", "code": "dict1 = {'key1':'value1', 'key2':'value2'}\nprint(dict1['key1'])\ndict2 = {3:'val1', 2:'val2'}\nprint(dict2[3])\nprint(dict2[4])      # KeyError", "pid": "c09-p02"}]}, {"title": "조작", "blocks": [{"t": "md", "text": "- 추가/수정: `d[key] = value`\n- 삭제: `del(d[key])`\n- 키 존재 확인: `key in d` (True/False)\n- 크기: `len(d)`"}, {"t": "code", "code": "d = {'key1':'value1', 'key2':'value2'}\nd['key3'] = 'value3'\nprint(d)\ndel(d['key1'])\nprint(d)\nif 'key3' in d:\n    print(d['key3'])\nprint(len(d))", "pid": "c09-p03"}]}, {"title": "keys(), values()", "blocks": [{"t": "md", "text": "- `d.keys()`: 키를 모두 반환 (순서 없음) / `d.values()`: 값을 모두 반환 (순서 없음)"}, {"t": "code", "code": "d = {'key1':'value1', 'key2':'value2'}\nprint(d.keys())\nprint(d.values())\nfor key in d.keys():\n    print(key)", "pid": "c09-p04"}]}, {"title": "복사 — dict()", "blocks": [{"t": "code", "code": "# lab1: 같은 객체를 가리킴 (alias)\nd1 = {'key1':'value1', 'key2':'value2'}\nd2 = d1\nd1['key3'] = 'value3'\nprint(d1)\nprint(d2)\n\n# lab2: dict()로 복사\nd1 = {'key1':'value1', 'key2':'value2'}\nd2 = dict(d1)\nd1['key3'] = 'value3'\nprint(d1)\nprint(d2)", "pid": "c09-p05"}]}], "practice": [{"id": "c09-p01", "title": "", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "dict1 = {}\ndict2 = {'key1':'value1', 'key2':'value2'}\ndict3 = {0:'value1', 1:'value2'}", "notes": []}, {"id": "c09-p02", "title": "검색", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "dict1 = {'key1':'value1', 'key2':'value2'}\nprint(dict1['key1'])\ndict2 = {3:'val1', 2:'val2'}\nprint(dict2[3])\nprint(dict2[4])      # KeyError", "notes": []}, {"id": "c09-p03", "title": "조작", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "d = {'key1':'value1', 'key2':'value2'}\nd['key3'] = 'value3'\nprint(d)\ndel(d['key1'])\nprint(d)\nif 'key3' in d:\n    print(d['key3'])\nprint(len(d))", "notes": []}, {"id": "c09-p04", "title": "keys(), values()", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "d = {'key1':'value1', 'key2':'value2'}\nprint(d.keys())\nprint(d.values())\nfor key in d.keys():\n    print(key)", "notes": []}, {"id": "c09-p05", "title": "복사 — dict()", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "# lab1: 같은 객체를 가리킴 (alias)\nd1 = {'key1':'value1', 'key2':'value2'}\nd2 = d1\nd1['key3'] = 'value3'\nprint(d1)\nprint(d2)\n\n# lab2: dict()로 복사\nd1 = {'key1':'value1', 'key2':'value2'}\nd2 = dict(d1)\nd1['key3'] = 'value3'\nprint(d1)\nprint(d2)", "notes": []}], "examples": [{"id": "c09-e1", "title": "예제1", "prompt": "5명의 이름과 전화번호를 받아 dictionary에 저장하시오.\n\n- 키(key): 이름\n- 값(value): 전화번호\n- 같은 이름은 없다고 가정하시오.\n\ndictionary를 출력하시오.", "reference": [{"label": "교재 정답", "code": "phonebook = {}\nfor count in range(5):\n    name = input('input a name: ')\n    phone = input('input a phone number: ')\n    phonebook[name] = phone\nprint(phonebook)"}], "notes": []}], "labs": [{"id": "c09-l1", "title": "실습1", "prompt": "예제1의 프로그램을 수정하시오.\n\n- 5개의 항목을 저장한 후, 사용자로부터 이름을 입력받고 그 사람의 전화번호를 출력하시오.\n- 찾지 못한 경우, \"찾을 수 없음\" 메시지를 출력하시오.", "notes": []}, {"id": "c09-l2", "title": "실습2", "prompt": "다음 프로그램을 작성하시오.\n\n- 메뉴: \"입력\", \"검색\", \"삭제\", \"종료“\n- \"입력\": 이름과 전화번호를 받아 저장하시오.\n- \"검색\": 이름을 입력받아 해당 이름의 전화번호를 출력하시오.\n- \"삭제\": 이름을 입력받아 해당 항목을 삭제하시오.\n- \"종료\" 명령이 입력될 때까지 이 작업들을 반복하시오.\n\n```\nType the command (input, search, delete, or quit)\n input\n // handle input\n\nType the command (input, search, delete, or quit)\n search\n // handle search\n\nType the command (input, search, delete, or quit)\n quit\n```", "notes": []}, {"id": "c09-l3", "title": "실습3", "prompt": "3명의 학생의 이름과 그들의 수학, 과학, 역사 점수를 입력받으시오.\n\n- 키(key): 이름\n- 값(value): 수학, 과학, 역사 점수\n\n최고 점수를 받은 학생의 이름을 출력하시오.", "notes": []}, {"id": "c09-l4", "title": "실습4", "prompt": "사용자로부터 문장을 입력 받아, 유일한 단어의 개수를 출력하시오.\n\n- The little boy ran down the street, holding a small toy in his hand. As he ran, the wind blew through his hair, and the sound of the leaves rustling in the wind made him smile. He looked around as he ran, seeing the trees sway gently in the wind, and he couldn't help but feel a sense of joy as he ran faster, his toy still clutched tightly in his hand.", "notes": []}]}, {"no": 10, "title": "클래스 (Class)", "concept": [{"title": "배우기 전에", "blocks": [{"t": "md", "text": "- 데이터 타입: int, float, string, list, tuple, dictionary, … (C/Java는 명시적, Python은 암묵적)\n- 각 데이터 타입에는 적용 가능한 연산이 있다.\n  - int, float: `a += 7`, `a == 4`, `a <= 2` …\n  - string: `mstring += 'bb'`, `mstring *= 3`, `mstring == 'aa'` …\n  - list: `mylist.append(3)`, `mylist.extend([4, 5])`, `mylist.pop()` …\n- 객체(인스턴스): 각 변수는 어떤 데이터 타입의 객체. `a = 3` → a는 integer 타입의 객체, `mylist = [3, 6]` → list 타입의 객체"}]}, {"title": "클래스란?", "blocks": [{"t": "md", "text": "- 클래스: 프로그래머가 정의한 데이터 타입 = 멤버 변수 + 메서드(연산)\n- 객체(인스턴스): 데이터 타입이 클래스인 변수. 한 클래스로 여러 객체를 생성할 수 있다."}]}, {"title": "클래스 정의", "blocks": [{"t": "code", "code": "class class_name(parent) :\n    <member variables>        # implicit\n    <special class methods>\n    <methods>", "template": true}, {"t": "md", "text": "- Student 예: 멤버 변수 ID, name, phone / 메서드 setID(), getID(), setName(), getName(), setPhone(), getPhone()"}, {"t": "code", "code": "class Student(object) :\n    def setID(self, ID) :\n        self.ID = ID\n    def setName(self, name) :\n        self.name = name\n    def setPhone(self, phone) :\n        self.phone = phone\n    def getID(self) :\n        return self.ID\n    …", "template": true}]}, {"title": "생성자 (constructor) __init__", "blocks": [{"t": "md", "text": "- 객체(인스턴스)를 생성할 때 자동으로 호출되는 메서드, 주로 멤버 변수 초기화에 사용"}, {"t": "code", "code": "def __init__(self, other parameters) :\n    <expressions>\n\nclass Student(object) :\n    def __init__(self, ID, name, phone) :\n        self.ID = ID\n        self.name = name\n        self.phone = phone\n    def getID(self) :\n        return self.ID\n    …", "template": true}]}, {"title": "객체 생성 및 멤버 접근 (. 연산자)", "blocks": [{"t": "code", "code": "class Student(object) :\n    def __init__(self, id, name, phone) :\n        self.id = id\n        self.name = name\n        self.phone = phone\n\n    def setPhone(self, phone) :\n        self.phone = phone\n\nstudent = Student(1, 'a', '333')\nstudent.setPhone('444')", "pid": "c10-p01"}]}, {"title": "__str__() — 객체 출력", "blocks": [{"t": "md", "text": "- 클래스의 인스턴스를 print할 때 자동으로 호출. 문자열을 반환해야 함."}, {"t": "code", "code": "def __str__(self) :\n    <expressions>\n    return some_string", "template": true}]}, {"title": "기타 special methods", "blocks": [{"t": "md", "text": "- `__add__(self, other)`: `+` / `__sub__`: `-` / `__mul__`: `*`\n- `__eq__(self, other)`: `==` / `__lt__(self, other)`: `<` / `__len__(self)`: `len(self)`"}]}, {"title": "copy vs. alias", "blocks": [{"t": "code", "code": "num1 = complex_num(2, 3)\nnum2 = num1         # num2와 num1은 같은 인스턴스를 가리킴 (alias)\nprint(num1, num2)\nnum1.real = 4\nprint(num1, num2)", "pid": "c10-p02"}]}, {"title": "인스턴스 변수와 클래스 변수", "blocks": [{"t": "md", "text": "- 인스턴스 변수: 인스턴스 간에 공유되지 않음, 각 인스턴스가 고유하게 가짐\n- 클래스 변수: 클래스의 모든 인스턴스 간에 공유됨, 클래스당 하나만 존재"}, {"t": "code", "code": "class Student(object) :\n    student_count = 0\n\n    def __init__(self, id, name, phone) :\n        self.id = id\n        self.name = name\n        self.phone = phone\n        Student.student_count += 1\n    def __str__(self) :\n        return str(self.id)\n\nstudent1 = Student(Student.student_count, 'a', '333')\nstudent2 = Student(Student.student_count, 'b', '444')\nstudent3 = Student(Student.student_count, 'c', '555')\n\nprint(student1, student2, student3)", "pid": "c10-p03"}]}], "practice": [{"id": "c10-p01", "title": "객체 생성 및 멤버 접근 (. 연산자)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "class Student(object) :\n    def __init__(self, id, name, phone) :\n        self.id = id\n        self.name = name\n        self.phone = phone\n\n    def setPhone(self, phone) :\n        self.phone = phone\n\nstudent = Student(1, 'a', '333')\nstudent.setPhone('444')", "notes": []}, {"id": "c10-p02", "title": "copy vs. alias", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "num1 = complex_num(2, 3)\nnum2 = num1         # num2와 num1은 같은 인스턴스를 가리킴 (alias)\nprint(num1, num2)\nnum1.real = 4\nprint(num1, num2)", "notes": ["이 코드는 앞의 예제 2에서 정의한 `complex_num` 클래스를 사용합니다."]}, {"id": "c10-p03", "title": "인스턴스 변수와 클래스 변수", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "class Student(object) :\n    student_count = 0\n\n    def __init__(self, id, name, phone) :\n        self.id = id\n        self.name = name\n        self.phone = phone\n        Student.student_count += 1\n    def __str__(self) :\n        return str(self.id)\n\nstudent1 = Student(Student.student_count, 'a', '333')\nstudent2 = Student(Student.student_count, 'b', '444')\nstudent3 = Student(Student.student_count, 'c', '555')\n\nprint(student1, student2, student3)", "notes": []}], "examples": [{"id": "c10-e1", "title": "예제1", "prompt": "복소수를 표현하는 complex_num 클래스를 정의하시오.\n\n- member variables? real, image\n- special methods? constructor\n- other methods? print", "reference": [{"label": "교재 정답", "code": "class complex_num(object) :\n    def __init__(self, real, image):\n        self.real = real\n        self.image = image\n\n    def print(self) :\n        prt = str(self.real) + ' + ' + str(self.image) + 'i'\n        print(prt)\n\nnum1 = complex_num(3, 4)\nnum2 = complex_num(2, 7)\nnum1.print()\nnum2.print()"}], "notes": ["메서드 이름 print는 내장 함수 print와 같은 이름이므로, 메서드 안에서 내장 print를 호출할 수 있다는 점이 흥미로운 부분입니다."]}, {"id": "c10-e2", "title": "예제2", "prompt": "복소수를 표현하는 complex_num 클래스를 정의하시오.\n\n- member variables? real, image\n- special methods? constructor, __str__()", "reference": [{"label": "교재 정답", "code": "class complex_num(object) :\n    def __init__(self, real, image):\n        self.real = real\n        self.image = image\n\n    def __str__(self) :\n        prt = str(self.real) + ' + ' + str(self.image) + 'i'\n        return prt\n\nnum1 = complex_num(3, 4)\nnum2 = complex_num(2, 7)\nprint(num1)"}], "notes": []}, {"id": "c10-e3", "title": "예제3", "prompt": "예제2에, self와 다른 객체를 더한 결과 복소수를 반환하는 add() 메서드를 추가하시오.", "reference": [{"label": "교재 정답", "code": "class complex_num(object) :\n    def __init__(self, real, image):\n        self.real = real\n        self.image = image\n    def __str__(self) :\n        prt = str(self.real) + ' + ' + str(self.image) + 'i'\n        return prt\n    def add(self, other):\n        result = complex_num(self.real+other.real, self.image+other.image)\n        return result\n\nnum1 = complex_num(3, 4)\nnum2 = complex_num(2, 7)\nnum3 = num1.add(num2)     # self: num1, other: num2\nprint(num1, num2, num3)"}], "notes": []}, {"id": "c10-e4", "title": "예제4", "prompt": "complex_num 객체인 num1과 num2의 + 연산을 수행하도록 __add__ 메서드를 Example2에 추가하시오.", "reference": [{"label": "교재 정답", "code": "class complex_num(object) :\n    def __init__(self, real, image):\n        self.real = real\n        self.image = image\n    def __str__(self) :\n        prt = str(self.real) + ' + ' + str(self.image) + 'i'\n        return prt\n    def __add__(self, other):\n        result = complex_num(self.real+other.real, self.image+other.image)\n        return result\n\nnum1 = complex_num(3, 4)\nnum2 = complex_num(2, 7)\nnum3 = num1 + num2\nprint(num1, num2, num3)"}], "notes": ["교안 문장의 'Example2'는 예제2의 complex_num 클래스를 가리킵니다."]}], "labs": [{"id": "c10-l1", "title": "실습1", "prompt": "complex_num 객체인 num1과 num2의 – 연산을 수행하도록 예제4를 수정하시오.\n\n- __sub__() 추가", "notes": []}, {"id": "c10-l2", "title": "실습2", "prompt": "complex_num 객체인 num1과 num2의 == 연산을 수행하도록 실습1을 수정하시오.\n\n- __eq__() 추가", "notes": []}, {"id": "c10-l3", "title": "실습3", "prompt": "학생의 정보를 저장하는 클래스를 정의하시오 (학번, 이름, 성적)\n\n- 세 개의 객체를 생성하시오.\n- 이들을 리스트에 저장하시오.\n- 리스트를 출력하시오 (세 명의 학생 정보가 출력되어야 한다).", "notes": []}, {"id": "c10-l4", "title": "실습4", "prompt": "실습3의 코드를 수정하시오.\n\n- 성적이 가장 높은 객체를 찾아 출력하시오.", "notes": []}, {"id": "c10-l5", "title": "실습5", "prompt": "영화 정보를 저장하는 클래스를 정의하시오 (제목, 감독, 평점).\n\n- 사용자로부터 5개의 영화 정보를 입력받으시오.\n- 이들을 리스트에 저장하시오.\n- 리스트를 출력하시오 (5개의 영화 정보가 출력되어야 한다).", "notes": []}, {"id": "c10-l6", "title": "실습6", "prompt": "실습5의 코드를 수정하시오.\n\n- 사용자로부터 감독의 이름을 입력받으시오.\n- 그 감독의 영화 중에서 가장 높은 평점을 가진 영화를 출력하시오.\n- 해당 감독의 영화가 없으면, 없다는 메시지를 출력하시오.", "notes": []}]}, {"no": 11, "title": "상속 (Inheritance)", "concept": [{"title": "개요", "blocks": [{"t": "md", "text": "- 정의된 클래스(부모 클래스)를 상속하여 새로운 클래스(자식 클래스)를 정의할 수 있다.\n- 자식은 부모의 멤버 변수 및 메서드를 모두 상속한다.\n- 예: human(name, ssn, age, address) → student(+ student_id, grade), teacher(+ teacher_id, salary)"}, {"t": "code", "code": "class human(object) :\n    def __init__(self, ssn, name, age, addr):\n        self.ssn = ssn\n        self.name = name\n        …\n    def get_name(self):\n        return self.name\n    def get_ssn(self):\n        return self.ssn\n\nclass student(human) :\n    def __init__(self, ssn, name, age, addr, sid, grade):\n        super().__init__(ssn, name, age, addr)      # human의 __init__() 호출\n        self.sid = sid\n        self.grade = grade\n    def get_sid(self):\n        …\n    def get_grade(self):\n        …", "template": true}]}, {"title": "메서드 오버라이딩", "blocks": [{"t": "md", "text": "- 자식 클래스가 부모 클래스에서 정의된 동일한 이름의 메서드를 재정의하는 것\n- 예제1에서 student, teacher는 human의 `__init__()`, `__str__()`를 오버라이드한다."}]}], "practice": [], "examples": [{"id": "c11-e1", "title": "예제1", "prompt": "human, student, teacher 클래스를 정의하시오.\n\n- human\n  - ssn, name\n  - __init__(), __str__(), get_name(), get_ssn()\n- student\n  - ssn, name, sid, grade\n  - __init__(), __str__(), get_name(), get_ssn(), get_sid(), get_grade(), set_grade(grade)\n- teacher\n  - ssn, name, tid, salary\n  - __init__(), __str__(), get_name(), get_ssn(), get_tid(), get_salary(), set_salary(salary)", "reference": [{"label": "교재 정답", "code": "class human(object) :\n    def __init__(self, ssn, name):\n        self.ssn = ssn\n        self.name = name\n    def __str__(self):\n        prt = self.ssn + ', ' + self.name\n        return prt\n    def get_name(self):\n        return self.name\n    def get_ssn(self):\n        return self.ssn\n\nclass student(human) :\n    def __init__(self, ssn, name, sid, grade=0.0):   # 0.0은 grade의 기본값\n        super().__init__(ssn, name)\n        self.sid = sid\n        self.grade = grade\n    def __str__(self):\n        return \"%s, %s, %s, %f\" % (self.ssn, self.name, self.sid, self.grade)\n    def get_sid(self):\n        return self.sid\n    def get_grade(self):\n        return self.grade\n    def set_grade(self, grade):\n        self.grade = grade\n\nclass teacher(human) :\n    def __init__(self, ssn, name, tid, salary=0):    # 0은 salary의 기본값\n        super().__init__(ssn, name)\n        self.tid = tid\n        self.salary = salary\n    def __str__(self):\n        return \"%s, %s, %s, %d\" % (self.ssn, self.name, self.tid, self.salary)\n    def get_tid(self):\n        return self.tid\n    def get_salary(self):\n        return self.salary\n    def set_salary(self, salary):\n        self.salary = salary\n\nteacher1 = teacher('75', 'aaa', '08')        # salary에는 0이 할당됨\nstudent1 = student('00', 'bbb', '20', 3.0)\n\nprint(teacher1.get_name())\nprint(teacher1.get_tid())\nprint(student1.get_name())\nprint(student1.get_sid())\n\nprint(teacher1)\nprint(student1)"}], "notes": ["교안 원본의 teacher 클래스는 `self.sid = sid`, `get_sid()`로 적혀 있어 그대로 실행하면 오류가 납니다(매개변수는 tid). 이 학습 자료의 교재 코드는 이를 tid로 바로잡은 버전입니다."]}, {"id": "c11-e2", "title": "예제2", "prompt": "animal, dog, cat 클래스를 정의하시오.\n\n- animal\n  - name, age\n  - __init__(), __str__(), get_name(), get_age(), speak()\n- dog\n  - name, age\n  - __init__(), __str__(), get_name(), get_age(), speak()\n- cat\n  - name, age\n  - __init__(), __str__(), get_name(), get_age(), speak()", "reference": [{"label": "교재 정답", "code": "class Animal:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n    def get_name(self):\n        return self.name\n    def get_age(self):\n        return self.age\n    def sound(self):\n        print('This animal makes a sound')\n\nclass Dog(Animal):\n    def __init__(self, name, age):\n        super().__init__(name, age)\n    def sound(self):       # 메서드 오버라이딩\n        print('Woof!')\n\nclass Cat(Animal):\n    def __init__(self, name, age):\n        super().__init__(name, age)\n    def sound(self):       # 메서드 오버라이딩\n        print('Meow!')\n\ndog = Dog(\"Happy\", 4)\ncat = Cat(\"Kitty\", 2)\n\ndog.sound()\ncat.sound()"}], "notes": ["교안의 문제 설명에는 메서드 이름이 speak()로 적혀 있지만 교안의 코드는 sound()를 사용합니다. 교재 코드는 sound() 기준입니다."]}], "labs": []}, {"no": 12, "title": "파일 입출력", "concept": [{"title": "개요", "blocks": [{"t": "md", "text": "- print()/input() 대신 파일에 출력하고, 파일에서 데이터를 읽을 수 있다."}]}, {"title": "3단계", "blocks": [{"t": "md", "text": "1. 파일 열기: `fd = open(path, mode)`\n   - path: 절대 경로(`c:\\data.txt`), 상대 경로(`data.txt`)\n   - 모드: `r` 읽기(처음부터) / `w` 쓰기(덮어씀) / `a` 추가(끝에서부터) / `r+`, `w+` 읽기 및 쓰기\n2. 읽기 또는 쓰기 작업\n3. 파일 닫기: `fd.close()`"}]}, {"title": "write()", "blocks": [{"t": "code", "code": "fd = open('temp.txt', 'w')\nfd.write('python')\nfd.close()", "pid": "c12-p01"}]}, {"title": "readline()", "blocks": [{"t": "md", "text": "- 파일에서 한 줄을 읽어오며, 파일 끝에서는 빈 문자열 `''` 반환"}, {"t": "code", "code": "fd = open('names.txt', 'r')\nline = fd.readline()\nprint(line)\nfd.close()", "pid": "c12-p02"}]}, {"title": "readlines()", "blocks": [{"t": "md", "text": "- 파일의 모든 줄을 읽어 리스트로 반환"}]}, {"title": "with – as 구문", "blocks": [{"t": "md", "text": "- close()를 따로 호출할 필요 없이 자동으로 파일이 닫힘"}, {"t": "code", "code": "with open(\"names.txt\", \"w\") as f:\n    f.write(\"python\\n\")", "pid": "c12-p03"}]}], "practice": [{"id": "c12-p01", "title": "write()", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "fd = open('temp.txt', 'w')\nfd.write('python')\nfd.close()", "notes": []}, {"id": "c12-p02", "title": "readline()", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "fd = open('names.txt', 'r')\nline = fd.readline()\nprint(line)\nfd.close()", "notes": []}, {"id": "c12-p03", "title": "with – as 구문", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "with open(\"names.txt\", \"w\") as f:\n    f.write(\"python\\n\")", "notes": []}], "examples": [{"id": "c12-e1", "title": "예제1", "prompt": "이름을 “names.txt” 파일에 5번 출력하라.", "reference": [{"label": "교재 정답", "code": "fd = open('names.txt', 'w')\nfor count in range(5) :\n    fd.write('ilhoon\\n')\nfd.close()"}], "notes": []}, {"id": "c12-e2", "title": "예제2", "prompt": "“names.txt”의 모든 줄을 읽어 출력하라.", "reference": [{"label": "교재 정답", "code": "fd = open('names.txt', 'r')\n\nwhile (True) :\n    line = fd.readline()\n    if (line == ''):\n        break\n    print(line)\n\nfd.close()"}, {"label": "rstrip()을 사용한 버전", "code": "fd = open('names.txt', 'r')\n\nwhile (True) :\n    line = fd.readline()\n    if (line == ''):\n        break\n    line = line.rstrip()\n    print(line)\nfd.close()"}], "notes": []}, {"id": "c12-e3", "title": "예제3", "prompt": "“names.txt”의 모든 줄을 읽어 출력하라.\n\n- use readlines()", "reference": [{"label": "교재 정답", "code": "fd = open(\"names.txt\", \"r\")\nlines = fd.readlines()\nfor line in lines:\n    line = line.rstrip()\n    print(line)\nfd.close()"}], "notes": []}, {"id": "c12-e4", "title": "예제4", "prompt": "“names.txt”에 이름 5번 출력하시오.\n\n- use with-as", "reference": [{"label": "교재 정답", "code": "with open('names.txt', 'w') as fd:\n    for count in range(5) :\n        fd.write('ilhoon\\n')"}], "notes": []}, {"id": "c12-e5", "title": "예제5", "prompt": "“names.txt”의 모든 줄을 읽어 출력하라.\n\n- use with-as", "reference": [{"label": "교재 정답", "code": "with open('names.txt', 'r') as fd:\n    lines = fd.readlines()\n    for line in lines:\n        line = line.rstrip()\n        print(line)"}], "notes": []}], "labs": [{"id": "c12-l1", "title": "실습1", "prompt": "songs.txt 파일을 읽고 모든 정보를 화면에 출력하시오.\n\n```\nsinger1 always 3934\nsinger2 taken   6873\nsinger3 love_of_my_life 2768\nsinger2 last_christmas   1973\nsinger2 only 3322\n```", "notes": []}, {"id": "c12-l2", "title": "실습2", "prompt": "songs.txt 파일을 읽고 가장 큰 count를 가진 노래 제목을 출력하시오.", "notes": []}, {"id": "c12-l3", "title": "실습3", "prompt": "songs.txt 파일을 읽고 검색할 가수를 입력받아 그 가수가 부른 노래 중 가장 큰 count를 가진 노래를 출력하시오.", "notes": []}, {"id": "c12-l4", "title": "실습4", "prompt": "songs.txt 파일을 읽고 가장 많은 노래를 부른 가수를 출력하시오.", "notes": []}, {"id": "c12-l5", "title": "실습5", "prompt": "news.txt 파일을 읽고 가장 많이 등장하는 상위 10개의 단어를 출력하시오.\n\n- 참고\n  - 딕셔너리를 키를 기준으로 오름차순으로 정렬: `new_dic = dict(sorted(dic.items()))`\n  - 딕셔너리를 키를 기준으로 내림차순으로 정렬: `new_dic = dict(sorted(dic.items(), reverse=True))`\n  - 딕셔너리를 값을 기준으로 내림차순으로 정렬: `new_dic = dict(sorted(dic.items(), key=lambda x:x[1], reverse=True))`", "notes": []}]}, {"no": 13, "title": "재귀 (Recursion)", "concept": [{"title": "재귀 함수", "blocks": [{"t": "md", "text": "- 자기 자신을 호출하는 함수"}, {"t": "code", "code": "def rec_func1() :\n    rec_func1()\n\ndef rec_func2(count) :\n    if (count == 0) :\n        return\n    count -= 1\n    rec_func2(count)", "pid": "c13-p01"}]}, {"title": "장점", "blocks": [{"t": "md", "text": "- 분할 정복(Divide and Conquer) / 축소 정복(Decrease and Conquer)으로 문제를 해결하는 방법\n- 문제를 더 작은 문제로 축소: f(n) ⇒ f(n-1)\n- 핵심 아이디어: f(n-1) 또는 f(n-2)의 솔루션을 사용해 f(n)의 솔루션을 구함"}]}, {"title": "장단점", "blocks": [{"t": "md", "text": "- 문제에 따라 더 간단하고 직관적, 프로그래머 관점에서 효율적\n- 컴퓨터 관점에서는 비효율적: 스택 오버플로(Stack Overflow) 가능, 반복에 비해 일반적으로 실행 시간이 더 긺"}]}], "practice": [{"id": "c13-p01", "title": "재귀 함수", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "def rec_func1() :\n    rec_func1()\n\ndef rec_func2(count) :\n    if (count == 0) :\n        return\n    count -= 1\n    rec_func2(count)", "notes": []}], "examples": [{"id": "c13-e1", "title": "예제1", "prompt": "1부터 n까지의 합계를 계산하는 mysum(n) 함수를 정의하시오.\n\n- 방법1: f(n) = 1 + 2 + … + n\n- 방법2 : f(n) = n + f(n-1)\n  f(1) = 1", "reference": [{"label": "반복 방식", "code": "# 반복\ndef mysum(n):\n    result = 0\n    for i in range(1, n+1):\n        result += i\n    return result\n\nprint(mysum(10))"}, {"label": "재귀 방식", "code": "# 재귀\ndef mysum(n):\n    if (n == 1) :\n        return 1\n    return (n + mysum(n-1))   # mysum(10) => 10 + mysum(9) => 10 + 9 + mysum(8) => …\n\nprint(mysum(10))"}], "notes": []}, {"id": "c13-e2", "title": "예제2", "prompt": "n!을 계산하는 myfactorial(n) 함수를 정의하시오.\n\n- n! = n * (n-1)!, 1! = 1", "reference": [{"label": "교재 정답", "code": "def myfactorial(n):\n    if (n == 1) :\n        return 1\n    result = n * myfactorial(n-1)\n    return result\n\nprint(myfactorial(3))     # 3 * myfactorial(2) => 2 * myfactorial(1) => 1"}], "notes": []}], "labs": [{"id": "c13-l1", "title": "실습1", "prompt": "재귀적으로 피보나치 수열을 계산하는 fib(n) 함수를 정의하시오.\n\n- fib(0) = 0\n- fib(1) = 1\n- fib(n) = fib(n-1) + fib(n-2), if n > 1", "notes": []}, {"id": "c13-l2", "title": "실습2", "prompt": "재귀적으로 피보나치 수열을 계산하는 fib(n) 함수를 정의하시오.\n\n- 실습1의 fib() 함수는 이미 한번 계산한 피보나치 수도 다시 계산하는 문제가 있음. => n이 커지면 실행 시간이 기하급수적으로 증가\n- 이미 계산된 피보나치 수를 저장하여 활용하도록 수정하시오.", "notes": []}, {"id": "c13-l3", "title": "실습3", "prompt": "세 개의 기둥과 각기 다른 크기의 디스크가 있다.\n\n- 디스크는 현재 기둥 A에 큰 디스크가 아래에, 작은 디스크가 위에 있는 순서로 쌓여 있다.\n- 다음 조건을 만족하며 모든 디스크를 기둥 C로 옮기시오.\n  - 한 번에 디스크를 하나씩만 옮길 수 있다.\n  - 큰 디스크는 작은 디스크 위에 놓일 수 없다.\n\n교안의 풀이 안내\n\n- 디스크가 하나만 있을 경우: 디스크 1을 기둥 A에서 기둥 C로 이동.\n- 디스크가 두 개일 경우 (2는 1보다 큼): 디스크 1을 A에서 B로, 디스크 2를 A에서 C로, 디스크 1을 B에서 C로 이동\n- 디스크가 N개일 경우: N-1개의 해결 방법을 안다고 가정하고 설계\n  - 디스크 1부터 N-1까지를 기둥 A에서 기둥 B로 이동\n  - 디스크 N을 기둥 A에서 기둥 C로 이동.\n  - 디스크 1부터 N-1까지를 기둥 B에서 기둥 C로 이동.", "notes": []}]}, {"no": 14, "title": "예외처리", "concept": [{"title": "개요", "blocks": [{"t": "md", "text": "- 예외(Exception): 프로그램의 정상적인 진행을 막는 예외적인 문제 (0으로 나누기, 파일 열기 에러, …)\n- 예외처리: 에러를 감지하고 적절히 대응하여 프로그램이 정상적으로 동작하도록 함"}]}, {"title": "try-except 구문", "blocks": [{"t": "code", "code": "try:\n    # 에러가 발생할 가능성이 있는 코드\nexcept ExceptionType:\n    # 에러 발생 시 실행할 코드\nelse:\n    # 에러가 발생하지 않았을 때 실행되는 코드\nfinally:\n    # 무조건 실행되는 코드", "template": true}]}, {"title": "예시", "blocks": [{"t": "code", "code": "try:\n    x = 10 / 0\nexcept ZeroDivisionError:\n    print('0으로 나눌 수 없다.')", "pid": "c14-p01"}, {"t": "code", "code": "try:\n    file = open('test.txt', 'r')\nexcept FileNotFoundError:\n    print('파일을 찾을 수 없음')\nelse:\n    print('파일이 성공적으로 열림')\nfinally:\n    print('종료')", "pid": "c14-p02"}]}, {"title": "자주 사용되는 예외", "blocks": [{"t": "md", "text": "- `ZeroDivisionError`: 0으로 나누기 시 발생\n- `ValueError`: 잘못된 값이 입력될 때 발생\n- `TypeError`: 데이터 타입이 올바르지 않을 때 발생\n- `KeyError`: 딕셔너리에서 존재하지 않는 키를 참조할 때 발생\n- `FileNotFoundError`: 파일이 존재하지 않을 때 발생"}]}, {"title": "ValueError 예제", "blocks": [{"t": "code", "code": "try:\n    num = int(\"abc\")\nexcept ValueError as e:\n    print(\"ValueError 발생:\", e)\n\ntry:\n    my_list = [1, 2, 3]\n    index = my_list.index(5)\nexcept ValueError as e:\n    print(\"ValueError 발생:\", e)", "pid": "c14-p03"}]}, {"title": "TypeError 예제", "blocks": [{"t": "code", "code": "try:\n    result = \"hello\" + 5\nexcept TypeError as e:\n    print(\"TypeError 발생:\", e)\n\ntry:\n    result = [1, 2, 3] + 4\nexcept TypeError as e:\n    print(\"TypeError 발생:\", e)", "pid": "c14-p04"}]}, {"title": "KeyError 예제", "blocks": [{"t": "code", "code": "try:\n    my_dict = {\"a\": 1, \"b\": 2}\n    value = my_dict[\"c\"]\nexcept KeyError as e:\n    print(\"KeyError 발생:\", e)", "pid": "c14-p05"}, {"t": "md", "text": "- 피보나치 메모이제이션에 활용"}, {"t": "code", "code": "def _fib(n, dic) :\n    if n == 0 or n == 1 :\n        return n\n\n    try:\n        return dic[n]\n    except KeyError as e:\n        result = _fib(n-1, dic) + _fib(n-2, dic)\n        dic[n] = result\n        return result", "pid": "c14-p06"}]}, {"title": "Exception — 최상위 예외 클래스", "blocks": [{"t": "code", "code": "try:\n    my_dict = {\"a\": 1, \"b\": 2}\n    value = my_dict[\"c\"]\nexcept Exception as e:\n    print(\"KeyError 발생:\", e)", "pid": "c14-p07"}]}, {"title": "사용자 정의 예외", "blocks": [{"t": "md", "text": "- 예외 클래스를 직접 정의할 수 있으며, `Exception` 클래스를 상속받아야 함"}, {"t": "code", "code": "class CustomError(Exception):\n    pass\n\ntry:\n    raise CustomError('사용자 정의 에러 발생')\nexcept CustomError as e:\n    print(e)", "pid": "c14-p08"}, {"t": "code", "code": "class AgeTooLowError(Exception):\n    def __init__(self, age):\n        super().__init__(f\"입력한 나이 {age}는 너무 낮음\")\n        self.age = age\n\ndef check_age(age):\n    if age < 18:\n        raise AgeTooLowError(age)\n    print(\"나이가 적절함\")\n\ntry:\n    check_age(15)\nexcept AgeTooLowError as e:\n    print(e)", "pid": "c14-p09"}]}], "practice": [{"id": "c14-p01", "title": "예시 (1/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "try:\n    x = 10 / 0\nexcept ZeroDivisionError:\n    print('0으로 나눌 수 없다.')", "notes": []}, {"id": "c14-p02", "title": "예시 (2/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "try:\n    file = open('test.txt', 'r')\nexcept FileNotFoundError:\n    print('파일을 찾을 수 없음')\nelse:\n    print('파일이 성공적으로 열림')\nfinally:\n    print('종료')", "notes": []}, {"id": "c14-p03", "title": "ValueError 예제", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "try:\n    num = int(\"abc\")\nexcept ValueError as e:\n    print(\"ValueError 발생:\", e)\n\ntry:\n    my_list = [1, 2, 3]\n    index = my_list.index(5)\nexcept ValueError as e:\n    print(\"ValueError 발생:\", e)", "notes": []}, {"id": "c14-p04", "title": "TypeError 예제", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "try:\n    result = \"hello\" + 5\nexcept TypeError as e:\n    print(\"TypeError 발생:\", e)\n\ntry:\n    result = [1, 2, 3] + 4\nexcept TypeError as e:\n    print(\"TypeError 발생:\", e)", "notes": []}, {"id": "c14-p05", "title": "KeyError 예제 (1/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "try:\n    my_dict = {\"a\": 1, \"b\": 2}\n    value = my_dict[\"c\"]\nexcept KeyError as e:\n    print(\"KeyError 발생:\", e)", "notes": []}, {"id": "c14-p06", "title": "KeyError 예제 (2/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "def _fib(n, dic) :\n    if n == 0 or n == 1 :\n        return n\n\n    try:\n        return dic[n]\n    except KeyError as e:\n        result = _fib(n-1, dic) + _fib(n-2, dic)\n        dic[n] = result\n        return result", "notes": []}, {"id": "c14-p07", "title": "Exception — 최상위 예외 클래스", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "try:\n    my_dict = {\"a\": 1, \"b\": 2}\n    value = my_dict[\"c\"]\nexcept Exception as e:\n    print(\"KeyError 발생:\", e)", "notes": []}, {"id": "c14-p08", "title": "사용자 정의 예외 (1/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "class CustomError(Exception):\n    pass\n\ntry:\n    raise CustomError('사용자 정의 에러 발생')\nexcept CustomError as e:\n    print(e)", "notes": []}, {"id": "c14-p09", "title": "사용자 정의 예외 (2/2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "class AgeTooLowError(Exception):\n    def __init__(self, age):\n        super().__init__(f\"입력한 나이 {age}는 너무 낮음\")\n        self.age = age\n\ndef check_age(age):\n    if age < 18:\n        raise AgeTooLowError(age)\n    print(\"나이가 적절함\")\n\ntry:\n    check_age(15)\nexcept AgeTooLowError as e:\n    print(e)", "notes": []}], "examples": [], "labs": []}, {"no": 15, "title": "데이터 시각화 (matplotlib)", "concept": [{"title": "개요", "blocks": [{"t": "md", "text": "- 파이썬에서 널리 쓰이는 그래픽 라이브러리 (https://matplotlib.org/api/pyplot_summary.html)\n- 사용법\n  - `import matplotlib.pyplot`\n  - `import matplotlib.pyplot as plt`\n  - `from matplotlib.pyplot import *`"}], "practiceIds": []}, {"title": "선 그래프 (기본 그래프 타입)", "blocks": [{"t": "code", "code": "import matplotlib.pyplot as plt\nplt.plot([1, 2, 3], [2, 4, 6])\nplt.show()", "shown": true}, {"t": "code", "code": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny = [2, 4, 6]\nplt.plot(x, y)\nplt.show()", "shown": true}], "practiceIds": ["c15-p01", "c15-p02"]}, {"title": "마커가 있는 선 그래프", "blocks": [{"t": "code", "code": "plt.plot(x, y, marker='o')\nplt.show()", "shown": true}], "practiceIds": ["c15-p03"]}, {"title": "산점도 / 막대 / 원 그래프", "blocks": [{"t": "code", "code": "plt.scatter(x, y)     # 산점도\nplt.show()\n\nplt.bar(x, y)         # 막대 그래프\nplt.show()\n\nx = [1, 2, 3]\nplt.pie(x)            # 원 그래프\nplt.show()", "shown": true}], "practiceIds": ["c15-p04", "c15-p05", "c15-p06"]}, {"title": "프레임 크기 변경", "blocks": [{"t": "code", "code": "plt.figure(figsize=(5, 3))\nplt.bar(x, y)\nplt.show()", "shown": true}], "practiceIds": ["c15-p07"]}, {"title": "색상 변경", "blocks": [{"t": "code", "code": "plt.figure(figsize=(5, 3))\nplt.bar(x, y, color='red')\nplt.show()", "shown": true}, {"t": "code", "code": "plt.figure(figsize=(5, 3))\nplt.bar(x, y, color=(0.3, 0.2, 0.5))   # RGB를 0~1 사이 값으로\nplt.show()", "shown": true}], "practiceIds": ["c15-p08", "c15-p09"]}, {"title": "제목 / 축 레이블", "blocks": [{"t": "code", "code": "plt.figure()\nplt.title('my_graph')\nplt.xlabel('x axis')\nplt.ylabel('y axis')\nplt.bar(x, y, color=(0.3, 0.2, 0.5))\nplt.show()", "shown": true}], "practiceIds": ["c15-p10"]}, {"title": "축 눈금 / 축 범위", "blocks": [{"t": "code", "code": "plt.figure()\nplt.xticks(x)\nplt.yticks(y)\nplt.plot(x, y, color=(0.3, 0.2, 0.5))\nplt.show()", "shown": true}, {"t": "code", "code": "plt.figure()\nplt.xlim([0, 5])\nplt.ylim([0, 10])\nplt.plot(x, y, color=(0.3, 0.2, 0.5))\nplt.show()", "shown": true}], "practiceIds": ["c15-p11", "c15-p12"]}, {"title": "범례 (legend)", "blocks": [{"t": "code", "code": "plt.figure()\nplt.plot(x, y, color=(0.3, 0.2, 0.5), label='data1')\nplt.legend()\nplt.show()", "shown": true}, {"t": "md", "text": "- 위치(loc): upper left / upper center / upper right / center left / center / center right / lower left / lower center / lower right"}, {"t": "code", "code": "plt.legend(loc='upper right')", "shown": true}], "practiceIds": ["c15-p13", "c15-p14"]}, {"title": "여러 데이터 그리기", "blocks": [{"t": "code", "code": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny1 = [2, 4, 6]\ny2 = [3, 6, 9]\nplt.figure()\nplt.plot(x, y1, color=(0.3, 0.2, 0.5), label='data1')\nplt.plot(x, y2, color=(0.7, 0.4, 0.2), label='data2')\nplt.legend()\nplt.show()", "shown": true}], "practiceIds": ["c15-p15"]}], "practice": [{"id": "c15-p01", "title": "선 그래프 (1)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nplt.plot([1, 2, 3], [2, 4, 6])    # by default, the graph type is a line graph.\nplt.show()", "notes": []}, {"id": "c15-p02", "title": "선 그래프 (2)", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny = [2, 4, 6]\nplt.plot(x, y)\nplt.show()", "notes": []}, {"id": "c15-p03", "title": "마커가 있는 선 그래프", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny = [2, 4, 6]\nplt.plot(x, y, marker='o')\nplt.show()", "notes": []}, {"id": "c15-p04", "title": "산점도", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny = [2, 4, 6]\nplt.scatter(x, y)\nplt.show()", "notes": []}, {"id": "c15-p05", "title": "막대 그래프", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny = [2, 4, 6]\nplt.bar(x, y)\nplt.show()", "notes": []}, {"id": "c15-p06", "title": "원 그래프", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\nplt.pie(x)\nplt.show()", "notes": []}, {"id": "c15-p07", "title": "프레임 크기 변경", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny = [2, 4, 6]\nplt.figure(figsize=(5, 3))\nplt.bar(x, y)\nplt.show()", "notes": []}, {"id": "c15-p08", "title": "색상 변경 (1) 색 이름", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny = [2, 4, 6]\nplt.figure(figsize=(5, 3))\nplt.bar(x, y, color='red')\nplt.show()", "notes": []}, {"id": "c15-p09", "title": "색상 변경 (2) RGB 값", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny = [2, 4, 6]\nplt.figure(figsize=(5, 3))\nplt.bar(x, y, color=(0.3, 0.2, 0.5))   # RGB scaled to between 0 and 1\nplt.show()", "notes": []}, {"id": "c15-p10", "title": "제목과 축 레이블", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny = [2, 4, 6]\nplt.figure()\nplt.title('my_graph')\nplt.xlabel('x axis')\nplt.ylabel('y axis')\nplt.bar(x, y, color=(0.3, 0.2, 0.5))   # RGB scaled to between 0 and 1\nplt.show()", "notes": []}, {"id": "c15-p11", "title": "축 눈금 변경", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny = [2, 4, 6]\nplt.figure()\nplt.xticks(x)\nplt.yticks(y)\nplt.plot(x, y, color=(0.3, 0.2, 0.5))\nplt.show()", "notes": []}, {"id": "c15-p12", "title": "축 범위 변경", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny = [2, 4, 6]\nplt.figure()\nplt.xlim([0, 5])\nplt.ylim([0, 10])\nplt.plot(x, y, color=(0.3, 0.2, 0.5))\nplt.show()", "notes": []}, {"id": "c15-p13", "title": "범례", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny = [2, 4, 6]\nplt.figure()\nplt.plot(x, y, color=(0.3, 0.2, 0.5), label='data1')\nplt.legend()\nplt.show()", "notes": []}, {"id": "c15-p14", "title": "범례 위치", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny = [2, 4, 6]\nplt.figure()\nplt.plot(x, y, color=(0.3, 0.2, 0.5), label='data1')\nplt.legend(loc='upper right')\nplt.show()", "notes": []}, {"id": "c15-p15", "title": "여러 데이터 그리기", "prompt": "교안의 이 코드를 직접 입력해 작성해 보세요.", "lessonCode": "import matplotlib.pyplot as plt\nx = [1, 2, 3]\ny1 = [2, 4, 6]\ny2 = [3, 6, 9]\nplt.figure()\nplt.plot(x, y1, color=(0.3, 0.2, 0.5), label='data1')\nplt.plot(x, y2, color=(0.7, 0.4, 0.2), label='data2')\nplt.legend()\nplt.show()", "notes": ["교안 원본 코드는 첫 번째 plot에서 정의되지 않은 변수 `y`를 사용합니다. 이 학습 자료의 교안 코드는 `y1`로 바로잡은 버전입니다."]}], "examples": [], "labs": []}]};
+</script>
+<script>
+(function () {
+  'use strict';
+  var C = COURSE, MD = window.PLMd;
+  var KEY = 'pylab.single.v1';
+  var TABS = [['concept', '설명'], ['practice', '연습'], ['example', '예제'], ['lab', '실습']];
+  var LISTKEY = { practice: 'practice', example: 'examples', lab: 'labs' };
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ── 저장소 ──
+  var data = { code: {}, done: {}, shown: {}, last: null }, canSave = true;
+  try { var raw = localStorage.getItem(KEY); if (raw) { var o = JSON.parse(raw); ['code', 'done', 'shown'].forEach(function (k) { if (o[k]) data[k] = o[k]; }); data.last = o.last || null; } } catch (e) { canSave = false; }
+  var timer = null;
+  function flush() {
+    clearTimeout(timer); timer = null;
+    try { localStorage.setItem(KEY, JSON.stringify(data)); canSave = true; $('saveind').textContent = '✓ 저장됨'; }
+    catch (e) { canSave = false; $('saveind').textContent = '저장 불가'; $('warn').hidden = false; }
+  }
+  function save() { $('saveind').textContent = '저장 중…'; clearTimeout(timer); timer = setTimeout(flush, 300); }
+  window.addEventListener('pagehide', function () { if (timer) flush(); });
+  document.addEventListener('visibilitychange', function () { if (document.hidden && timer) flush(); });
+
+  // ── 도우미 ──
+  function h(tag, props) {
+    var e = document.createElement(tag), k; props = props || {};
+    for (k in props) { var v = props[k]; if (v == null || v === false) continue;
+      if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v; else if (k === 'html') e.innerHTML = v;
+      else if (k.slice(0, 2) === 'on') e.addEventListener(k.slice(2), v); else if (k === 'hidden') e.hidden = !!v; else e.setAttribute(k, v === true ? '' : v); }
+    for (var i = 2; i < arguments.length; i++) add(e, arguments[i]);
+    return e;
+  }
+  function add(e, c) { if (c == null || c === false) return; if (Array.isArray(c)) c.forEach(function (x) { add(e, x); }); else e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); }
+  function clear(e) { while (e.firstChild) e.removeChild(e.firstChild); return e; }
+  var toastEl, toastT;
+  function toast(m) { if (!toastEl) { toastEl = h('div', { class: 'toast', role: 'status' }); document.body.appendChild(toastEl); } toastEl.textContent = m; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove('show'); }, 2200); }
+  function copy(text, btn) {
+    function fb() { var ta = h('textarea', { style: 'position:fixed;left:-9999px;top:0' }); ta.value = text; document.body.appendChild(ta); ta.focus(); ta.select(); var ok = false; try { ok = document.execCommand('copy'); } catch (e) {} ta.remove(); return ok; }
+    function done(ok) { toast(ok ? '복사했습니다' : '복사하지 못했습니다. 직접 선택해서 복사하세요.'); }
+    if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(fb()); });
+    else done(fb());
+  }
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function probs(c) { return [].concat(c.practice, c.examples, c.labs); }
+  function prog(c) { var p = probs(c); return { d: p.filter(function (x) { return data.done[x.id]; }).length, t: p.length }; }
+
+  // ── 상태/라우팅 ──
+  var st = { ch: 1, tab: 'concept' }, pending = null;
+  function parse() { var m = /^#ch(\d+)(?:-(concept|practice|example|lab))?$/.exec(location.hash); if (!m) return null; var n = +m[1]; return n >= 1 && n <= C.chapters.length ? { ch: n, tab: m[2] || 'concept' } : null; }
+  function go(ch, tab, pid) { pending = pid || null; var hs = '#ch' + pad(ch) + (tab && tab !== 'concept' ? '-' + tab : ''); if (location.hash === hs) route(); else location.hash = hs; }
+  function setLast(pid) { data.last = { ch: st.ch, tab: st.tab, pid: pid || null }; save(); }
+  function route() {
+    var r = parse();
+    if (!r) { var l = data.last; if (l && !location.hash) { r = { ch: l.ch, tab: l.tab }; pending = l.pid || null; } else r = { ch: 1, tab: 'concept' }; }
+    st.ch = r.ch; st.tab = r.tab; document.body.classList.remove('nav-open'); $('menu').setAttribute('aria-expanded', 'false');
+    render(); refresh(); setLast(pending);
+    var t = pending && $('card-' + pending); pending = null;
+    if (t) t.scrollIntoView(); else window.scrollTo(0, 0);
+    document.title = st.ch + '장 ' + C.chapters[st.ch - 1].title + ' – 파이썬 학습 노트';
+  }
+
+  function refresh() {
+    var nav = clear($('chlist')), tot = 0, dn = 0;
+    C.chapters.forEach(function (c) {
+      var p = prog(c); tot += p.t; dn += p.d;
+      nav.appendChild(h('a', { class: 'chitem' + (p.t && p.d === p.t ? ' complete' : ''), href: '#ch' + pad(c.no), 'aria-current': c.no === st.ch ? 'page' : null },
+        h('span', { class: 'no', text: c.no }), h('span', { class: 'tt', text: c.title }), h('span', { class: 'cnt', text: p.t ? p.d + '/' + p.t : '설명' }),
+        h('span', { class: 'mini' }, h('i', { style: 'width:' + (p.t ? Math.round(p.d / p.t * 100) : 0) + '%' }))));
+    });
+    var c = C.chapters[st.ch - 1], p = prog(c);
+    $('crumb').innerHTML = '<b>' + c.no + '장</b> ' + MD.esc(c.title) + ' › ' + TABS.filter(function (t) { return t[0] === st.tab; })[0][1];
+    $('plabel').innerHTML = '이 단원 <b>' + p.d + '/' + p.t + '</b> · 전체 <b>' + dn + '/' + tot + '</b>';
+    $('pbar').style.width = (tot ? dn / tot * 100 : 0) + '%';
+    document.querySelectorAll('.tab').forEach(function (t) {
+      var k = t.dataset.tab; if (k === 'concept') return;
+      var l = c[LISTKEY[k]]; t.querySelector('.t2').textContent = l.length ? l.filter(function (x) { return data.done[x.id]; }).length + '/' + l.length + '개 완료' : '없음';
+    });
+  }
+
+  // ── 렌더 ──
+  function render() {
+    var c = C.chapters[st.ch - 1], main = clear($('content'));
+    main.appendChild(h('header', { class: 'chhead' }, h('div', { class: 'big', text: pad(c.no) }),
+      h('div', null, h('h1', { text: c.title }), h('div', { class: 'meta' }, h('span', { text: '연습 ' + c.practice.length }), h('span', { text: '예제 ' + c.examples.length }), h('span', { text: '실습 ' + c.labs.length })))));
+    var tabs = h('div', { class: 'tabs', role: 'tablist' });
+    TABS.forEach(function (t) {
+      var k = t[0], l = k === 'concept' ? null : c[LISTKEY[k]];
+      tabs.appendChild(h('button', { type: 'button', class: 'tab', role: 'tab', 'data-tab': k, 'aria-selected': String(k === st.tab), onclick: function () { go(c.no, k); } },
+        h('span', { class: 't1', text: t[1] }), h('span', { class: 't2', text: k === 'concept' ? c.concept.length + '개 주제' : l.length ? '' : '없음' })));
+    });
+    main.appendChild(tabs);
+    if (st.tab === 'concept') concept(c, main); else problems(c, st.tab, main);
+    main.appendChild(pager(c));
+    document.querySelectorAll('textarea.code').forEach(grow);
+  }
+  function codeBlock(code, label, extra) {
+    var bar = [h('span', { text: label })]; bar.push(h('span', { class: 'sp' })); (extra || []).forEach(function (x) { bar.push(x); });
+    bar.push(h('button', { type: 'button', class: 'btn sm', text: '복사', onclick: function () { copy(code); } }));
+    return h('div', { class: 'codeblock' }, h('div', { class: 'cb-bar' }, bar), h('pre', null, h('code', { html: MD.highlight(code) })));
+  }
+  function concept(c, main) {
+    if (c.concept.length > 1) {
+      var nav = h('div', { class: 'secnav' });
+      c.concept.forEach(function (s, i) { nav.appendChild(h('button', { type: 'button', class: 'chip', text: s.title, onclick: function () { $('sec-' + i).scrollIntoView(); } })); });
+      main.appendChild(nav);
+    }
+    c.concept.forEach(function (s, i) {
+      var sec = h('section', { class: 'concept-sec', id: 'sec-' + i }, h('h2', { text: s.title }));
+      s.blocks.forEach(function (b) {
+        if (b.t === 'md') { sec.appendChild(h('div', { class: 'md', html: MD.render(b.text) })); return; }
+        var ex = [];
+        if (b.pid) ex.push(h('button', { type: 'button', class: 'btn sm primary', text: '연습에서 직접 써 보기 →', onclick: function () { go(c.no, 'practice', b.pid); } }));
+        else if (b.shown) ex.push(h('button', { type: 'button', class: 'btn sm', text: '연습 탭으로 →', onclick: function () { go(c.no, 'practice'); } }));
+        sec.appendChild(codeBlock(b.code, b.template ? '문법 형식 (교안 표기)' : '교안 코드', ex));
+      });
+      main.appendChild(sec);
+    });
+  }
+  var EMPTY = { practice: '연습', example: '예제', lab: '실습' };
+  var INTRO = {
+    practice: '교안에 나온 코드를 보고 <b>직접 입력</b>해 보는 칸입니다. 이 프로그램은 코드를 실행하지 않으니, 실행은 다른 파이썬 환경에서 해 보세요.',
+    example: '먼저 직접 작성해 보세요. <b>교재 정답은 숨겨져 있고</b> [정답 보기]를 눌러야 나타납니다(다시 누르면 숨겨집니다).',
+    lab: '교안에 <b>정답이 없는</b> 문제입니다. 직접 작성해 보세요.'
+  };
+  function problems(c, tab, main) {
+    var list = c[LISTKEY[tab]];
+    if (!list.length) { main.appendChild(h('div', { class: 'empty' }, h('b', { text: '이 단원의 교안에는 \'' + EMPTY[tab] + '\'이(가) 없습니다.' }), '교안에 없는 항목이라 비워 두었습니다.')); return; }
+    main.appendChild(h('p', { class: 'md', html: INTRO[tab] }));
+    list.forEach(function (p, i) { main.appendChild(card(p, tab, i + 1, list.length)); });
+  }
+  function grow(ta) { ta.style.height = 'auto'; ta.style.height = Math.max(ta.scrollHeight + 2, 190) + 'px'; }
+  function card(p, tab, i, n) {
+    var done = !!data.done[p.id];
+    var chk = h('button', { type: 'button', class: 'done-btn', 'aria-pressed': String(done), 'aria-label': p.title + ' 완료 표시', title: '완료 표시', html: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>' });
+    var tags = [h('span', { class: 'tag', text: EMPTY[tab] })];
+    if (tab === 'example') tags.push(h('span', { class: 'tag book', text: '교재 정답 있음' }));
+    if (tab === 'lab') tags.push(h('span', { class: 'tag none', text: '교안에 정답 없음' }));
+    var body = h('div', { class: 'pc-body' });
+    var el = h('article', { class: 'pcard' + (done ? ' is-done' : ''), id: 'card-' + p.id },
+      h('div', { class: 'pc-head' }, chk, h('h3', null, h('span', { class: 'idx', text: EMPTY[tab] + ' ' + i + '/' + n }), p.title), h('div', { class: 'tags' }, tags)), body);
+    chk.onclick = function () { var v = !data.done[p.id]; if (v) data.done[p.id] = Date.now(); else delete data.done[p.id]; chk.setAttribute('aria-pressed', String(v)); el.classList.toggle('is-done', v); setLast(p.id); refresh(); };
+    body.appendChild(h('div', { class: 'prompt md', html: MD.render(p.prompt) }));
+    if (tab === 'practice') body.appendChild(codeBlock(p.lessonCode, '교안 코드'));
+    (p.notes || []).forEach(function (t) { body.appendChild(h('div', { class: 'notebox', html: '<b>참고 (교안 외 설명)</b> ' + MD.render(t).replace(/^<p>|<\/p>$/g, '') })); });
+
+    var ta = h('textarea', { class: 'code', spellcheck: 'false', autocapitalize: 'off', autocomplete: 'off', autocorrect: 'off', wrap: 'off', 'aria-label': p.title + ' 코드 작성', placeholder: '여기에 코드를 작성하세요 (Tab 키로 들여쓰기)' });
+    ta.value = data.code[p.id] || '';
+    var trap = false;
+    ta.addEventListener('input', function () { data.code[p.id] = ta.value; grow(ta); setLast(p.id); });
+    ta.addEventListener('focus', function () { trap = false; setLast(p.id); });
+    ta.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { trap = true; return; }
+      var s = ta.selectionStart, t = ta.selectionEnd, v = ta.value;
+      if (e.key === 'Tab' && !trap && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        var ls = v.lastIndexOf('\n', s - 1) + 1;
+        if (s !== t && v.slice(s, t).indexOf('\n') >= 0 || e.shiftKey) {
+          var block = v.slice(ls, t), lines = block.split('\n'), delta0 = 0, delta = 0;
+          lines = lines.map(function (ln, k) {
+            if (e.shiftKey) { var m = /^( {1,4}|\t)/.exec(ln); if (!m) return ln; if (k === 0) delta0 = -m[0].length; delta -= m[0].length; return ln.slice(m[0].length); }
+            if (k === 0) delta0 = 4; delta += 4; return '    ' + ln;
+          });
+          ta.value = v.slice(0, ls) + lines.join('\n') + v.slice(t);
+          ta.selectionStart = Math.max(ls, s + delta0); ta.selectionEnd = t + delta;
+        } else { ta.value = v.slice(0, s) + '    ' + v.slice(t); ta.selectionStart = ta.selectionEnd = s + 4; }
+        ta.dispatchEvent(new Event('input'));
+      } else if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+        e.preventDefault();
+        var line = v.slice(v.lastIndexOf('\n', s - 1) + 1, s), ind = /^[ \t]*/.exec(line)[0] + (/:\s*$/.test(line) ? '    ' : '');
+        ta.value = v.slice(0, s) + '\n' + ind + v.slice(t); ta.selectionStart = ta.selectionEnd = s + 1 + ind.length;
+        ta.dispatchEvent(new Event('input'));
+      }
+    });
+    var clearBtn = h('button', { type: 'button', class: 'btn', text: '지우기' }), armed = null;
+    clearBtn.onclick = function () {
+      if (!ta.value) return;
+      if (!armed) { clearBtn.textContent = '한 번 더 누르면 지웁니다'; armed = setTimeout(function () { armed = null; clearBtn.textContent = '지우기'; }, 3000); return; }
+      clearTimeout(armed); armed = null; clearBtn.textContent = '지우기'; ta.value = ''; ta.dispatchEvent(new Event('input')); ta.focus();
+    };
+    var tb = h('div', { class: 'toolbar' }, h('button', { type: 'button', class: 'btn primary', text: '내 코드 전체 복사', onclick: function () { if (!ta.value.trim()) { toast('복사할 코드가 없습니다'); return; } copy(ta.value); } }), clearBtn);
+    body.appendChild(h('div', { class: 'edwrap' }, h('div', { class: 'edlabel' }, h('span', { text: '내 코드' }), h('span', { text: '자동 저장 · Tab: 들여쓰기 · Esc 후 Tab: 다음 칸으로 이동' })), ta));
+    body.appendChild(tb);
+
+    if (tab === 'example') {
+      var panel = h('div', { class: 'answer book', hidden: true, id: 'ans-' + p.id });
+      panel.appendChild(h('div', { class: 'answer-head' }, h('span', { class: 'tag book', text: '교재 정답' })));
+      p.reference.forEach(function (r) { panel.appendChild(h('div', { class: 'answer-body' }, codeBlock(r.code, p.reference.length > 1 ? r.label : '교재 정답'))); });
+      var tg = h('button', { type: 'button', class: 'btn', 'aria-expanded': 'false', 'aria-controls': 'ans-' + p.id });
+      function setShown(v) { panel.hidden = !v; tg.textContent = v ? '정답 숨기기' : '정답 보기'; tg.setAttribute('aria-expanded', String(v)); if (v) data.shown[p.id] = 1; else delete data.shown[p.id]; }
+      tg.onclick = function () { setShown(panel.hidden); save(); };
+      setShown(!!data.shown[p.id]);
+      tb.appendChild(tg); body.appendChild(panel);
+    }
+    return el;
+  }
+  function pager(c) {
+    var ord = ['concept', 'practice', 'example', 'lab'], i = ord.indexOf(st.tab);
+    var prev = i > 0 ? h('button', { type: 'button', class: 'btn', text: '← ' + TABS[i - 1][1], onclick: function () { go(c.no, ord[i - 1]); } }) : c.no > 1 ? h('button', { type: 'button', class: 'btn', text: '← ' + (c.no - 1) + '장', onclick: function () { go(c.no - 1, 'lab'); } }) : h('span');
+    var next = i < 3 ? h('button', { type: 'button', class: 'btn primary', text: TABS[i + 1][1] + ' →', onclick: function () { go(c.no, ord[i + 1]); } }) : c.no < C.chapters.length ? h('button', { type: 'button', class: 'btn primary', text: (c.no + 1) + '장 →', onclick: function () { go(c.no + 1, 'concept'); } }) : h('span');
+    return h('div', { class: 'chnav' }, prev, next);
+  }
+
+  // ── 내보내기 / 불러오기 ──
+  $('btn-export').onclick = function () {
+    var txt = JSON.stringify({ app: 'pylab-single', version: 1, exportedAt: new Date().toISOString(), data: data }, null, 1);
+    var a = h('a', { href: URL.createObjectURL(new Blob([txt], { type: 'application/json' })), download: 'python-notes-' + new Date().toISOString().slice(0, 10) + '.json' });
+    document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    $('iostatus').textContent = '내보냈습니다.';
+  };
+  $('btn-import').onclick = function () { $('file').click(); };
+  $('file').onchange = function () {
+    var f = this.files[0]; if (!f) return; var inp = this;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        var o = JSON.parse(String(rd.result));
+        if (!o || o.app !== 'pylab-single' || !o.data) throw new Error('이 프로그램에서 내보낸 파일이 아닙니다.');
+        ['code', 'done', 'shown'].forEach(function (k) { data[k] = o.data[k] || {}; });
+        data.last = o.data.last || null; flush(); $('iostatus').textContent = '불러왔습니다. (기존 기록은 파일 내용으로 바뀌었습니다)'; route();
+      } catch (e) { $('iostatus').textContent = '불러오지 못했습니다: ' + e.message; }
+      inp.value = '';
+    };
+    rd.readAsText(f);
+  };
+  $('menu').onclick = function () { var o = document.body.classList.toggle('nav-open'); this.setAttribute('aria-expanded', String(o)); };
+  $('scrim').onclick = function () { document.body.classList.remove('nav-open'); $('menu').setAttribute('aria-expanded', 'false'); };
+  window.addEventListener('hashchange', route);
+  if (!canSave) $('warn').hidden = false;
+  window.PLTest = { data: function () { return data; }, flush: flush };
+  route();
+})();
+</script>
+</body>
+</html>
